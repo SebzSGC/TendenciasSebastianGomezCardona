@@ -1,11 +1,11 @@
 def searchPatient(hospital,userName):
-    for person in hospital.patients:
-        if person.userName==userName:
-            return person
+    for patient in hospital.patients:
+        if patient.fullName==userName:
+            return patient
     return None
 
 def searchEmployee(hospital,userName):
-    for person in hospital.employees:
-        if person.userName==userName:
-            return person
+    for employee in hospital.employees:
+        if employee.userName==userName:
+            return employee
     return None

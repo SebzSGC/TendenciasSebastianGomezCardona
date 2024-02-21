@@ -1,71 +1,93 @@
-from model import User 
-from model import Employee
-from model import Hospital
-from service import loginService 
+from model.User import User
+from model.Employee import Employee
+from model.Hospital import Hospital
+from service import loginService
+from validator import typeValidator
+from service.RolService import AdministrativePersonal, Doctor, Nurse, HumanResources, InformationSupport
 
-employee1 = Employee("John Doe", "123456789", "johndoe@example.com", "1234567890", "1990-01-01", "123 Main St", "Manager", "johndoe", "password")
+hospital = Hospital()
+employee1 = Employee("John Doe", "123456789", "johndoe@example.com", "1234567890", "1990-01-01", "123 Main St", "Recursos Humanos", "johndoe", "password")
+hospital.employees.append(employee1)
 
-def adminMenu(hospital, user):
+#MENUS
+def adminMenu(hospital, currentUser):
     print("Inicializando menu de administrador")
 
-def doctorMenu(hospital, user):
+def doctorMenu(hospital, currentUser):
     print("Inicializando menu de doctor")
 
-def nurseMenu(hospital, user):
+def nurseMenu(hospital, currentUser):
     print("Inicializando menu de enfermera")
 
-def supportMenu(hospital, user):
+def supportMenu(hospital, currentUser):
     print("Inicializando menu de soporte")
 
-def HumanResourcesMenu(hospital, user):
-    print("Inicializando menu de recursos humanos")
+def HumanResourcesMenu(hospital, currentUser):
+    while True:
+        print(f"Inicializando menu de recursos humanos: {currentUser.fullName}")
+        option=input("1. crear empleado \n2. cambiar rol de empleado \n3. eliminar empleado\n4. cerrar sesion\n")
+        if option=="1":
+            newUser = Employee.createEmployee(typeValidator)
+            HumanResources.createEmployee(hospital, newUser)
+        elif option=="2":
+            typeValidator.manageEmployeeRole(hospital, loginService, HumanResources)
+        elif option=="3":
+            deleteEmployee = input("ingrese el nombre de usuario del empleado a eliminar:\n")
+            HumanResources.deleteEmployee(hospital, deleteEmployee, loginService)  
+        elif option == "4":
+            print("cerrando sesion...")
+            return
+        else:
+            print("opcion no valida")
+            continue
 
-def userMenu(hospital, user):
+def userMenu(hospital, currentUser):
     print("Inicializando menu de usuario")
-
-def loginRouter(hospital,user):
-    if isinstance(user, Employee):
-        if user.rol=="Administrador":
-            adminMenu(hospital,user)
-        elif user.rol=="Doctor":
-            doctorMenu(hospital,user)
-        elif user.rol=="Enfermera":
-            nurseMenu(hospital,user)
-        elif user.rol=="Soporte":
-            supportMenu(hospital,user)
-        elif user.rol=="Recursos Humanos":
-            HumanResourcesMenu(hospital,user)
-    elif isinstance(user, User):
-        userMenu(hospital,user)
+#RUTAS DE MENUS
+def loginRouter(hospital,currentUser):
+    if isinstance(currentUser, Employee):
+        if currentUser.rol=="Administrador":
+            adminMenu(hospital,currentUser)
+        elif currentUser.rol=="Doctor":
+            doctorMenu(hospital,currentUser)
+        elif currentUser.rol=="Enfermera":
+            nurseMenu(hospital,currentUser)
+        elif currentUser.rol=="Soporte":
+            supportMenu(hospital,currentUser)
+        elif currentUser.rol=="Recursos Humanos":
+            HumanResourcesMenu(hospital,currentUser)
+    elif isinstance(currentUser, User):
+        userMenu(hospital,currentUser)
 
 initialMenu="1. iniciar sesion\n0. cerrar programa\n"
 
 
 while True:
     option=input(initialMenu)
-    print("ha elegido la opcion", option)
     if option=="1":
-        print("ingrese su usuario:")
-        userName = input()
+        userName = input("ingrese su usuario:\n")
         password = input("ingrese la contraseña:\n")
-        print("eres un empleado?:")
-        userType = input("1. si\n2. no\n")
+        userType = None
+        while userType not in["1","2"]:
+            print("eres un empleado?:")
+            userType = input("1. si\n2. no\n")
         if userType=="1":
-            user = loginService.searchEmployee(Hospital,userName)
+            currentUser = loginService.searchEmployee(hospital,userName)
         elif userType=="2":
-            user = loginService.searchPatient(Hospital,userName)
+            currentUser = loginService.searchPatient(hospital,userName)
         else:
             print("opcion no valida")
             continue
-        if user==None:
+        if currentUser==None:
             print("usuario no encontrado")
             continue
-        if user.password!=password:
+        if currentUser.password!=password:
             print("error de usuario o contraseña")
             continue
-        loginRouter(Hospital,user)
-    if option == "0":
-        print("chau")
+        loginRouter(hospital,currentUser)
+    elif option == "0":
+        print("Saliendo...")
         break
-
-
+    else:
+        print("opcion no valida")
+        continue

@@ -1,5 +1,6 @@
-def createUser():
-    pass
+def createPatient(hospital,patient):
+    hospital.patients.append(patient)
+    return print(f"Paciente: {patient.fullName} creado con éxito")
 
 def generateAppointment():
     pass
