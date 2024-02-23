@@ -27,4 +27,22 @@ class Employee():
         userName = input("Nombre de usuario: ")
         password = input("Contraseña: ")
         return cls(fullName, idNumber, email, phoneNumber, bornDate, adress, rol, userName, password)
+    
+    def updateEmployee(self, attribute, newInfo):
+        correctAttributes ={
+            "1": "fullName",
+            "2": "idNumber",
+            "3": "email",
+            "4": "phone",
+            "5": "bornDate",
+            "6": "adress",
+            "7": "rol",
+            "8": "userName",
+            "9": "password"
+        }
+        if attribute in correctAttributes:
+            setattr(self, correctAttributes[attribute], newInfo)
+            return print(f"Empleado: {self.fullName} actualizado con éxito")
+        else:
+            return print("Opción inválida")
 

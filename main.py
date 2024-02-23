@@ -9,6 +9,15 @@ hospital = Hospital()
 employee1 = Employee("John Doe", "123456789", "johndoe@example.com", "1234567890", "1990-01-01", "123 Main St", "Recursos Humanos", "johndoe", "password")
 hospital.employees.append(employee1)
 
+def isNotNone(userToUpdate):
+    if userToUpdate == None:
+        print("Usuario no encontrado")
+        return
+    print("¿Qué información deseas cambiar?")
+    attribute = input("1. Nombre completo \n2. Numero de identificacion \n3. Correo electrónico \n4. Número de teléfono \n5. Fecha de nacimiento (YYYY-MM-DD)\n6. Dirección\n7. Rol\n8. Nombre de usuario\n9. Contraseña\n")
+    newValue = input("ingrese el nuevo valor:\n")
+    userToUpdate.updateEmployee(attribute, newValue)
+
 #MENUS
 def adminMenu(hospital, currentUser):
     print("Inicializando menu de administrador")
@@ -25,7 +34,7 @@ def supportMenu(hospital, currentUser):
 def HumanResourcesMenu(hospital, currentUser):
     while True:
         print(f"Inicializando menu de recursos humanos: {currentUser.fullName}")
-        option=input("1. crear empleado \n2. cambiar rol de empleado \n3. eliminar empleado\n4. cerrar sesion\n")
+        option=input("1. crear empleado \n2. cambiar rol de empleado \n3. eliminar empleado \n4. actualizar informacion de empleado \n5. cerrar sesion\n")
         if option=="1":
             newUser = Employee.createEmployee(typeValidator)
             HumanResources.createEmployee(hospital, newUser)
@@ -34,7 +43,11 @@ def HumanResourcesMenu(hospital, currentUser):
         elif option=="3":
             deleteEmployee = input("ingrese el nombre de usuario del empleado a eliminar:\n")
             HumanResources.deleteEmployee(hospital, deleteEmployee, loginService)  
-        elif option == "4":
+        elif option=="4":
+            userToUpdate = input("ingrese el nombre de usuario del empleado a actualizar:\n")
+            userToUpdate = loginService.searchEmployee(hospital, userToUpdate)
+            isNotNone(userToUpdate)
+        elif option == "5":
             print("cerrando sesion...")
             return
         else:
