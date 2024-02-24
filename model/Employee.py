@@ -28,7 +28,7 @@ class Employee():
         password = input("Contraseña: ")
         return cls(fullName, idNumber, email, phoneNumber, bornDate, adress, rol, userName, password)
     
-    def updateEmployee(self, attribute, newInfo):
+    def updateEmployee(self, attribute, newInfo, typeValidator):
         correctAttributes ={
             "1": "fullName",
             "2": "idNumber",
@@ -40,9 +40,14 @@ class Employee():
             "8": "userName",
             "9": "password"
         }
+        if attribute == "7":
+            newInfo = typeValidator.validRole(newInfo)
+        if newInfo == "Opción inválida":
+            return print("Opción inválida")
         if attribute in correctAttributes:
+            oldAttribute = getattr(self, correctAttributes[attribute])
             setattr(self, correctAttributes[attribute], newInfo)
-            return print(f"Empleado: {self.fullName} actualizado con éxito")
+            return print(f"Informacion del empleado: {oldAttribute} cambiado por {getattr(self, correctAttributes[attribute])}, actualizacion con éxito")
         else:
             return print("Opción inválida")
 

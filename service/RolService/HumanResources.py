@@ -9,8 +9,17 @@ def deleteEmployee(hospital, user, loginService):
     else:
         hospital.employees.remove(deletedUser)
         return print(f"Empleado: {deletedUser.fullName} eliminado con éxito")
-
+    
+def getAllEmployees(hospital):
+    userNumber = 1
+    for employee in hospital.employees:
+        print("---Lista de empleados---")
+        print(f"Empleado {userNumber}:")
+        print(
+        f"Nombre Completo: {employee.fullName}\nDocumento: {employee.idNumber}\nCorreo electrónico: {employee.email}\nNúmero de teléfono: {employee.phoneNumber}\nFecha de nacimiento: {employee.bornDate}\nDirección: {employee.adress}\nRol: {employee.rol}\nNombre de usuario: {employee.userName}\nContraseña: {employee.password}\n ")
+        userNumber += 1
+    return print("Usuarios cargados con éxito")    
 def reAssignRol(hospital, user, newRol):
-   oldRol = hospital.employees[hospital.employees.index(user)].rol 
-   hospital.employees[hospital.employees.index(user)].rol = newRol
+   oldRol = hospital.employees[hospital.employees.index(user)].role 
+   hospital.employees[hospital.employees.index(user)].role = newRol
    return print(f"Rol de {user.fullName} cambiado de {oldRol} a {newRol} con éxito")

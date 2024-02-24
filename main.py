@@ -7,16 +7,25 @@ from service.RolService import AdministrativePersonal, Doctor, Nurse, HumanResou
 
 hospital = Hospital()
 employee1 = Employee("John Doe", "123456789", "johndoe@example.com", "1234567890", "1990-01-01", "123 Main St", "Recursos Humanos", "johndoe", "password")
-hospital.employees.append(employee1)
+employee2 = Employee("sebastian", "123456789", "johndoe@example.com", "1234567890", "1990-01-01", "123 Main St", "Recursos Humanos", "sebz", "password")
 
-def isNotNone(userToUpdate):
+hospital.employees.append(employee1)
+hospital.employees.append(employee2)
+
+def isNotNoneUpatedUser(userToUpdate):
     if userToUpdate == None:
         print("Usuario no encontrado")
         return
     print("¿Qué información deseas cambiar?")
     attribute = input("1. Nombre completo \n2. Numero de identificacion \n3. Correo electrónico \n4. Número de teléfono \n5. Fecha de nacimiento (YYYY-MM-DD)\n6. Dirección\n7. Rol\n8. Nombre de usuario\n9. Contraseña\n")
-    newValue = input("ingrese el nuevo valor:\n")
-    userToUpdate.updateEmployee(attribute, newValue)
+    if attribute not in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
+        print("Opción inválida")
+        return
+    if attribute == "7":
+        newValue = input("Que rol deseas asignar?\n1. Administrador\n2. Doctor\n3. Enfermera\n4. Soporte\n5. Recursos Humanos\n")
+    else:
+        newValue = input("ingrese el nuevo valor:\n")
+    userToUpdate.updateEmployee(attribute, newValue, typeValidator)
 
 #MENUS
 def adminMenu(hospital, currentUser):
@@ -34,7 +43,7 @@ def supportMenu(hospital, currentUser):
 def HumanResourcesMenu(hospital, currentUser):
     while True:
         print(f"Inicializando menu de recursos humanos: {currentUser.fullName}")
-        option=input("1. crear empleado \n2. cambiar rol de empleado \n3. eliminar empleado \n4. actualizar informacion de empleado \n5. cerrar sesion\n")
+        option=input("1. crear empleado \n2. cambiar rol de empleado \n3. eliminar empleado \n4. actualizar informacion de empleado\n5. ver a todos los empleados \n6. cerrar sesion\n")
         if option=="1":
             newUser = Employee.createEmployee(typeValidator)
             HumanResources.createEmployee(hospital, newUser)
@@ -46,8 +55,10 @@ def HumanResourcesMenu(hospital, currentUser):
         elif option=="4":
             userToUpdate = input("ingrese el nombre de usuario del empleado a actualizar:\n")
             userToUpdate = loginService.searchEmployee(hospital, userToUpdate)
-            isNotNone(userToUpdate)
+            isNotNoneUpatedUser(userToUpdate)
         elif option == "5":
+            HumanResources.getAllEmployees(hospital)
+        elif option == "6":
             print("cerrando sesion...")
             return
         else:
