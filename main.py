@@ -92,9 +92,6 @@ while True:
         userName = input("ingrese su usuario:\n")
         password = input("ingrese la contraseña:\n")
         userType = None
-        while userType not in["1","2"]:
-            print("eres un empleado?:")
-            userType = input("1. si\n2. no\n")
         if userType=="1":
             currentUser = loginService.searchEmployee(hospital,userName)
         elif userType=="2":
