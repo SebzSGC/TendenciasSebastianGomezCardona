@@ -1,6 +1,3 @@
-def updateUser():
-    pass
-
 def updateMedicalInsurance():
     pass
 
