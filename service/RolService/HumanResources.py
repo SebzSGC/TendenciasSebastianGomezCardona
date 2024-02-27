@@ -11,6 +11,8 @@ def deleteEmployee(hospital, user, loginService):
         return print(f"Empleado: {deletedUser.fullName} eliminado con éxito")
     
 def getAllEmployees(hospital):
+    if len(hospital.employees) == 0:
+        return print("No hay empleados registrados en el sistema")
     userNumber = 1
     for employee in hospital.employees:
         print("---Lista de empleados---")

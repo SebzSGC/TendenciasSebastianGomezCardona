@@ -1,6 +1,6 @@
-def searchPatient(hospital,userName):
+def searchPatient(hospital,fullName):
     for patient in hospital.patients:
-        if patient.fullName==userName:
+        if patient.fullName==fullName:
             return patient
     return None
 
