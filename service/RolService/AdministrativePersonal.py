@@ -23,6 +23,13 @@ def createEmergencyContact(idUser, name, relationship, phoneNumber):
     contact = User.EmergencyContact(idUser, name, relationship, phoneNumber)
     patient.emergencyContact = contact
 
+def createMedicalInsurance(idUser, nameOfInsuranceCompany, policyNumber, policyState, policyValidity):
+    patient = validatePatientId(idUser)
+    if not patient:
+        raise Exception("El paciente no existe")
+    insurance = User.MedicalInsurance(idUser, nameOfInsuranceCompany, policyNumber, policyState, policyValidity)
+    patient.medicalInsurance = insurance
+
 def updatePatient(patient, attribute, newInfo, oldAttribute):
     patient = validatePatientId(patient.id)
     if not patient:
@@ -36,6 +43,13 @@ def updateEmergencyContact(contact, attribute, newInfo, oldAttribute):
         raise Exception("El contacto de emergencia no esta asociado a un paciente")
     setattr(contact, attribute, newInfo)
     print(f"Informacion de contacto del paciente: {oldAttribute} cambiado por {newInfo}, actualizacion con éxito")
+
+def updateMedicalInsurance(insurance, attribute, newInfo, oldAttribute):
+    insurance = validatePatientId(insurance.id)
+    if not insurance:
+        raise Exception("La poliza no esta asociada a un paciente")
+    setattr(insurance, attribute, newInfo)
+    print(f"Informacion de la poliza del paciente: {oldAttribute} cambiado por {newInfo}, actualizacion con éxito")
 
 def generateAppointment():
     pass

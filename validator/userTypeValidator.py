@@ -12,7 +12,7 @@ def getPatientData(hospital):
     administrativePersonal.createPatient(hospital, id, fullName, bornDate, genre, address, phoneNumber, email)
 
 def getUpdatePatientData(patient, attribute):
-        correctAttributes ={
+        correctAttributes = {
             "1": "fullName",
             "2": "bornDate",
             "3": "genre",
@@ -45,3 +45,25 @@ def getUpdateEmergencyContactData(contact, attribute):
         oldAttribute = getattr(contact, correctAttributes[attribute])
         newInfo = input(f"Ingrese el nuevo dato para {correctAttributes[attribute]}: ")
         administrativePersonal.updateEmergencyContact(contact, attribute, newInfo, oldAttribute)
+
+def getMedicalInsuranceData(patient):
+    print(f"Por favor ingrese los datos de la poliza de {patient.fullName}")
+    idUser = patient.id
+    nameOfInsuranceCompany = input("Nombre de la compañia de seguros: ")
+    policyNumber = input("Número de poliza: ")
+    policyState = input("Estado de la poliza: ")
+    policyValidity = input("Vigencia de la poliza: ")
+    administrativePersonal.createMedicalInsurance(idUser, nameOfInsuranceCompany, policyNumber, policyState, policyValidity)
+
+def getUpdateMedicalInsuranceData(insurance, attribute):
+    correctAttributes ={
+        "1": "nameOfInsuranceCompany",
+        "2": "policyNumber",
+        "3": "policyState",
+        "4": "policyValidity",
+    }
+
+    if attribute in correctAttributes:
+        oldAttribute = getattr(insurance, correctAttributes[attribute])
+        newInfo = input(f"Ingrese el nuevo dato para {correctAttributes[attribute]}: ")
+        administrativePersonal.updateMedicalInsurance(insurance, attribute, newInfo, oldAttribute)
