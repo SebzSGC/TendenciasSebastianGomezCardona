@@ -9,7 +9,6 @@ def getPatientData(hospital):
     address = input("Dirección: ")
     phoneNumber = input("Número de teléfono: ")
     email = input("Correo electrónico: ")
-    hospital.clinicalHistories[str(id)] = {} 
     administrativePersonal.createPatient(hospital, id, fullName, bornDate, genre, address, phoneNumber, email)
 
 def getUpdatePatientData(patient, attribute):
@@ -26,3 +25,23 @@ def getUpdatePatientData(patient, attribute):
             oldAttribute = getattr(patient, correctAttributes[attribute])
             newInfo = input(f"Ingrese el nuevo dato para {correctAttributes[attribute]}: ")
             administrativePersonal.updatePatient(patient, correctAttributes[attribute], newInfo, oldAttribute)
+
+def getEmergencyContactData(patient):
+    print(f"Por favor ingrese los datos del contacto de emergencia de {patient.fullName}")
+    id = patient.id
+    name = input("Nombre completo: ")
+    relationship = input("Relación: ")
+    phoneNumber = input("Número de teléfono: ")
+    administrativePersonal.createEmergencyContact(id, name, relationship, phoneNumber)
+
+def getUpdateEmergencyContactData(contact, attribute):
+    correctAttributes ={
+        "1": "name",
+        "2": "relationship",
+        "3": "phoneNumber",
+    }
+
+    if attribute in correctAttributes:
+        oldAttribute = getattr(contact, correctAttributes[attribute])
+        newInfo = input(f"Ingrese el nuevo dato para {correctAttributes[attribute]}: ")
+        administrativePersonal.updateEmergencyContact(contact, attribute, newInfo, oldAttribute)

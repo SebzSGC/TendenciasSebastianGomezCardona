@@ -2,7 +2,7 @@ from model.User import *
 from model.Employee import Employee
 from model.Hospital import Hospital
 from service import loginService
-from validator import typeValidator
+from validator import userTypeValidator, typeValidator, employeeTypeValidator
 from service.RolService import AdministrativePersonal, Doctor, Nurse, HumanResources, InformationSupport
 
 hospital = Hospital()
@@ -69,7 +69,7 @@ def isNotNoneUpatedUser(userToUpdate):
             newValue = input("Que rol deseas asignar?\n1. Administrador\n2. Doctor\n3. Enfermera\n4. Soporte\n5. Recursos Humanos\n")
         else:
             newValue = input("ingrese el nuevo valor:\n")
-        userToUpdate.updateEmployee(attribute, newValue, typeValidator)
+        userToUpdate.updateEmployee(attribute, newValue, )
 
 def isNotNoneUpatedPatient(userToUpdate):
     if userToUpdate == None:
@@ -101,7 +101,7 @@ def adminMenu(hospital, currentUser):
         print(f"Inicializando menu de administrador: {currentUser.fullName}")
         option=input("1. Registrar paciente \n2. Actualizar paciente\n3. Programar cita\n4. cerrar sesion\n5. cerrar sesion\n6. cerrar sesion\n")
         if option=="1":
-            newPatient = User.createPatient(hospital.patients, hospital)
+            newPatient = userTypeValidator.getPatientData(hospital)
             contact = EmergencyContact.createEmergencyContact(newPatient.id, newPatient.fullName)
             newPatient.emergencyContact = contact
             insurance = MedicalInsurance.createMedicalInsurance(newPatient.id, newPatient.fullName)
