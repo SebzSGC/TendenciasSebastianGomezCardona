@@ -11,7 +11,7 @@ class User():
         self.medicalInsurance = EmergencyContact
 
     @classmethod
-    def createPatient(cls, patients):
+    def createPatient(cls, patients, hospital):
         print("Por favor ingrese los datos del paciente:")
         id = len(patients) + 1
         fullName = input("Nombre completo: ")
@@ -20,6 +20,7 @@ class User():
         address = input("Dirección: ")
         phoneNumber = input("Número de teléfono: ")
         email = input("Correo electrónico: ")
+        hospital.clinicalHistories[str(id)] = {}
         return cls(id, fullName, bornDate, genre, address, phoneNumber, email)
     
     def updatePatient(self, attribute, newInfo):

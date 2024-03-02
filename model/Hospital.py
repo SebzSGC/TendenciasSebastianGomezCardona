@@ -3,4 +3,5 @@ class Hospital():
         self.patients=[]
         self.employees=[]
         self.orders=[]
+        self.patientVisitHistory={}
         self.clinicalHistories={}

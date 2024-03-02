@@ -101,7 +101,7 @@ def adminMenu(hospital, currentUser):
         print(f"Inicializando menu de administrador: {currentUser.fullName}")
         option=input("1. Registrar paciente \n2. Actualizar paciente\n3. Programar cita\n4. cerrar sesion\n5. cerrar sesion\n6. cerrar sesion\n")
         if option=="1":
-            newPatient = User.createPatient(hospital.patients)
+            newPatient = User.createPatient(hospital.patients, hospital)
             contact = EmergencyContact.createEmergencyContact(newPatient.id, newPatient.fullName)
             newPatient.emergencyContact = contact
             insurance = MedicalInsurance.createMedicalInsurance(newPatient.id, newPatient.fullName)
