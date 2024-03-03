@@ -1,18 +1,33 @@
-def createEmployee(hospital, user):
-    hospital.employees.append(user)
-    return print(f"Empleado: {user.fullName} creado con éxito")
+from model.Employee import Employee
 
-def deleteEmployee(hospital, user, loginService):
-    deletedUser = loginService.searchEmployee(hospital, user)
-    if deletedUser == None:
-        return print("Usuario no encontrado")
-    else:
-        hospital.employees.remove(deletedUser)
-        return print(f"Empleado: {deletedUser.fullName} eliminado con éxito")
+def validateEmployeeId(hospital, id):
+    if hospital.employees == []:
+        return None
+    for employee in hospital.employees:
+        if employee.idNumber == id:
+            return employee
+        return None
+
+def createEmployee(hospital, fullName, idNumber, email, phoneNumber, bornDate, adress, rol, userName, password):
+    employee = validateEmployeeId(hospital, idNumber)
+    if employee:
+        raise Exception("ya existe un empleado con esa cedula registrada")
+    employee = Employee(fullName, idNumber, email, phoneNumber, bornDate, adress, rol, userName, password)
+    hospital.employees.append(employee)
+
+def updateEmployee(employee, attribute, newInfo, oldAttribute):
+    setattr(employee, attribute, newInfo)
+    print(f"Informacion del empleado: {oldAttribute} cambiado por {newInfo}, actualizacion con éxito")
+
+def deleteEmployee(hospital, user):
+    if user not in hospital.employees:
+        raise Exception("Empleado no encontrado")
+    hospital.employees.remove(user)
+    print(f"Empleado: {user.fullName} eliminado con éxito")
     
 def getAllEmployees(hospital):
     if len(hospital.employees) == 0:
-        return print("No hay empleados registrados en el sistema")
+        raise Exception("No hay empleados registrados en el sistema")
     userNumber = 1
     for employee in hospital.employees:
         print("---Lista de empleados---")
@@ -20,8 +35,9 @@ def getAllEmployees(hospital):
         print(
         f"Nombre Completo: {employee.fullName}\nDocumento: {employee.idNumber}\nCorreo electrónico: {employee.email}\nNúmero de teléfono: {employee.phoneNumber}\nFecha de nacimiento: {employee.bornDate}\nDirección: {employee.adress}\nRol: {employee.rol}\nNombre de usuario: {employee.userName}\nContraseña: {employee.password}\n ")
         userNumber += 1
-    return print("Usuarios cargados con éxito")    
-def reAssignRol(hospital, user, newRol):
+    print("Usuarios cargados con éxito")   
+ 
+def updateRol(hospital, user, newRol):
    oldRol = hospital.employees[hospital.employees.index(user)].role 
    hospital.employees[hospital.employees.index(user)].role = newRol
-   return print(f"Rol de {user.fullName} cambiado de {oldRol} a {newRol} con éxito")
+   print(f"Rol de {user.fullName} cambiado de {oldRol} a {newRol} con éxito")
