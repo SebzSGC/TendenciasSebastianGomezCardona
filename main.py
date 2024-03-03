@@ -12,47 +12,7 @@ employee2 = Employee("sebastian", "123456789", "johndoe@example.com", "123456789
 hospital.employees.append(employee1)
 hospital.employees.append(employee2)
 
-def menuUpdateContactEmergency(userToUpdate):
-    while True:
-        print("¿Qué información deseas cambiar?")
-        attribute = input("1. Nombre completo \n2. Relación\n3. Número de teléfono\n4. Regresar\n")
-        if attribute not in ["1", "2", "3", "4"]:
-           return print("Opción inválida")
-        if attribute == "4":
-            break
-        newValue = input("ingrese el nuevo valor:\n")
-        contact = userToUpdate.emergencyContact.updateEmergencyContact(attribute, newValue)
-        if contact == "Opción inválida":
-            print("Opción inválida")
-            continue
-        print("Informacion de contacto de emergencia actualizada con éxito")
-        option = input("Deseas actualizar otro campo?\n1. Si\n2. No\n")
-        if option == "2":
-            break
-        if option == "1":
-            continue
-    return
-
-def menuUpdateInsurance(userToUpdate):
-    while True:
-        attribute = input("1. Nombre de la compañia de seguros \n2. Numero de poliza\n3. Estado de la poliza\n4. Vigencia de la poliza\n5. Regresar\n")
-        if attribute not in ["1", "2", "3", "4", "5"]:
-           return print("Opción inválida")
-        if attribute == "5":
-            break
-        newValue = input("ingrese el nuevo valor:\n")
-        insurance = userToUpdate.medicalInsurance.updateMedicalInsurance(attribute, newValue)
-        if insurance == "Opción inválida":
-            print("Opción inválida")
-            continue
-        print("Informacion de la poliza actualizada con éxito")
-        option = input("Deseas actualizar otro campo?\n1. Si\n2. No\n")
-        if option == "2":
-            break
-        if option == "1":
-            continue
-    return
-
+#SUBMENUS
 def isNotNoneUpatedUser(userToUpdate):
     if userToUpdate == None:
         print("Usuario no encontrado")
@@ -71,47 +31,30 @@ def isNotNoneUpatedUser(userToUpdate):
             newValue = input("ingrese el nuevo valor:\n")
         userToUpdate.updateEmployee(attribute, newValue, )
 
-def isNotNoneUpatedPatient(userToUpdate):
+def isNotNoneUpatedPatient(hospital, userToUpdate):
     if userToUpdate == None:
-        print("Usuario no encontrado")
-        return
-    while True:
-        print("¿Qué información deseas cambiar?")
-        attribute = input("1. Nombre completo \n2. Fecha de nacimiento\n3. Genero\n4. Direccion\n5. Numero de telefono\n6. Correo electronico\n7. Regresar\n")
-        if attribute not in ["1", "2", "3", "4", "5", "6", "7"]:
-            print("Opción inválida")
-            continue
-        if attribute == "7":
-            break
-        newValue = input("ingrese el nuevo valor:\n")
-        userToUpdate.updatePatient(attribute, newValue)
-        option = input("Deseas actualizar la informacion de contacto de emergencia?\n1. Si\n2. No\n")
-        if option == "1":
-            menuUpdateContactEmergency(userToUpdate)
-        option = input("Deseas actualizar la informacion de la poliza?\n1. Si\n2. No\n")
-        if option == "1":
-            menuUpdateInsurance(userToUpdate)
-        else:
-            break
-    return
-
+        return print("Usuario no encontrado")
+    userTypeValidator.validPatientData(hospital, userToUpdate)
+    print("Informacion actualizada con éxito")
+    
 #MENUS
 def adminMenu(hospital, currentUser):
+    print(f"Inicializando menu de administrador: {currentUser.fullName}")
     while True:
-        print(f"Inicializando menu de administrador: {currentUser.fullName}")
-        option=input("1. Registrar paciente \n2. Actualizar paciente\n3. Programar cita\n4. cerrar sesion\n5. cerrar sesion\n6. cerrar sesion\n")
+        option=input("1. Registrar paciente \n2. Actualizar paciente\n3. Programar cita\n4. cerrar sesion\n")
         if option=="1":
-            newPatient = userTypeValidator.getPatientData(hospital)
-            contact = EmergencyContact.createEmergencyContact(newPatient.id, newPatient.fullName)
-            newPatient.emergencyContact = contact
-            insurance = MedicalInsurance.createMedicalInsurance(newPatient.id, newPatient.fullName)
-            newPatient.medicalInsurance = insurance
-            AdministrativePersonal.createPatient(hospital, newPatient)
+            userTypeValidator.getPatientData(hospital)
+            newPatient = hospital.patients[-1]
+            userTypeValidator.getEmergencyContactData(hospital, newPatient)
+            userTypeValidator.getMedicalInsuranceData(hospital, newPatient)
+            userTypeValidator.allDataCompletePatient(hospital, newPatient)
         elif option=="2":
-            userToUpdate = input("ingrese el nombre completo del paciente a actualizar:\n")
-            userToUpdate = loginService.searchPatient(hospital, userToUpdate)
-            isNotNoneUpatedPatient(userToUpdate)
+            userToUpdateName = input("Ingrese el nombre completo del paciente a actualizar:\n")
+            userToUpdate = loginService.searchPatient(hospital, userToUpdateName)
+            isNotNoneUpatedPatient(hospital, userToUpdate)
         elif option=="3":
+            print("proximamente...")
+        elif option=="4":
             print("cerrando sesion...")
             return
         else:
@@ -167,7 +110,7 @@ def loginRouter(hospital,currentUser):
             supportMenu(hospital,currentUser)
         elif currentUser.rol=="Recursos Humanos":
             HumanResourcesMenu(hospital,currentUser)
-    elif isinstance(currentUser, User):
+    elif isinstance(currentUser, Patient):
         userMenu(hospital,currentUser)
 
 initialMenu="1. iniciar sesion\n0. cerrar programa\n"
