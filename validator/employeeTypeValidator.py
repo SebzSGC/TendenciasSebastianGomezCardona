@@ -22,7 +22,7 @@ def getEmployeeData(hospital):
     except Exception as error:
         print(str(error))
 
-def getUpdateEmployeeData(employee, attribute):
+def getUpdateEmployeeData(employee, attribute, newValue):
     try:
         correctAttributes = {
             "1": "fullName",
@@ -48,13 +48,13 @@ def getUpdateEmployeeData(employee, attribute):
             "9": "Contraseña"
         }
         if attribute == "7":
-            newInfo = typeValidator.validRole(newInfo)
-        if newInfo == "Opción inválida":
-            print("Opción inválida")
+            newValue = typeValidator.validRole(newValue)
+        if newValue == "Opción inválida":
+            raise Exception("Opción inválida")
         if attribute in correctAttributes:
             oldAttribute = getattr(employee, correctAttributes[attribute])
-            newInfo = input(f"Ingrese el nuevo dato para {attributeNames[attribute]}: ")
-            HumanResources.updateEmployee(employee, correctAttributes[attribute], newInfo, oldAttribute)
+            print(f"El valor actual de {attributeNames[attribute]} es: {oldAttribute}")
+            HumanResources.updateEmployee(employee, correctAttributes[attribute], newValue, oldAttribute)
     except Exception as error:
         print(str(error))
 
@@ -82,8 +82,24 @@ def getReAssignRolData(hospital):
             print("usuario no encontrado")
         else:
             print(f"Empleado: {employeeUser.fullName} encontrado")
+            print("¿Qué rol deseas asignar?")
             newRole = input("1. Administrador\n2. Doctor\n3. Enfermera\n4. Soporte\n5. Recursos Humanos\n")
             newRole = typeValidator.validRole(newRole)
             HumanResources.updateRol(hospital, employeeUser, newRole)
     except Exception as error:
         print(str(error))
+
+def validEmployeeData(userToUpdate):
+    while True:
+        print("¿Qué información deseas cambiar?")
+        attribute = input("1. Nombre completo \n2. Numero de identificacion \n3. Correo electrónico \n4. Número de teléfono \n5. Fecha de nacimiento (YYYY-MM-DD)\n6. Dirección\n7. Rol\n8. Nombre de usuario\n9. Contraseña\n10. Regresar\n")
+        if attribute not in ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]:
+            print("Opción inválida")
+            continue
+        if attribute == "10":
+            break
+        if attribute == "7":
+            newValue = input("Que rol deseas asignar?\n1. Administrador\n2. Doctor\n3. Enfermera\n4. Soporte\n5. Recursos Humanos\n")     
+        else:
+            newValue = input("ingrese el nuevo valor:\n")
+        getUpdateEmployeeData(userToUpdate, attribute, newValue)

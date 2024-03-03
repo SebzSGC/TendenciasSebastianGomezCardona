@@ -14,6 +14,7 @@ def createEmployee(hospital, fullName, idNumber, email, phoneNumber, bornDate, a
         raise Exception("ya existe un empleado con esa cedula registrada")
     employee = Employee(fullName, idNumber, email, phoneNumber, bornDate, adress, rol, userName, password)
     hospital.employees.append(employee)
+    print(f"Empleado: {employee.fullName} creado con éxito")
 
 def updateEmployee(employee, attribute, newInfo, oldAttribute):
     setattr(employee, attribute, newInfo)
@@ -38,6 +39,6 @@ def getAllEmployees(hospital):
     print("Usuarios cargados con éxito")   
  
 def updateRol(hospital, user, newRol):
-   oldRol = hospital.employees[hospital.employees.index(user)].role 
-   hospital.employees[hospital.employees.index(user)].role = newRol
+   oldRol = hospital.employees[hospital.employees.index(user)].rol 
+   hospital.employees[hospital.employees.index(user)].rol = newRol
    print(f"Rol de {user.fullName} cambiado de {oldRol} a {newRol} con éxito")
