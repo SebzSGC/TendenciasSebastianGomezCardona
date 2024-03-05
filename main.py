@@ -6,11 +6,15 @@ from validator import userTypeValidator, typeValidator, employeeTypeValidator
 from service.RolService import AdministrativePersonal, Doctor, Nurse, HumanResources, InformationSupport
 
 hospital = Hospital()
-employee1 = Employee("John Doe", "123456789", "johndoe@example.com", "1234567890", "1990-01-01", "123 Main St", "Recursos Humanos", "johndoe", "password")
-employee2 = Employee("sebastian", "123456789", "johndoe@example.com", "1234567890", "1990-01-01", "123 Main St", "Administrador", "sebz", "password")
+employee1 = Employee("John Doe", "123456789", "johndoe@example.com", "1234567890", "1990/01/01", "123 Main St", "Recursos Humanos", "johndoe", "password")
+employee2 = Employee("sebastian", "123456789", "johndoe@example.com", "1234567890", "1990/01/01", "123 Main St", "Administrador", "sebz", "password")
+employee3 = Employee("doctor", "123456789", "johndoe@example.com", "1234567890", "1990/01/01", "123 Main St", "Doctor", "doctor", "doctor")
+patient = Patient("123","paciente","1990/03/02", "masculino", "123 Main St", "123456","test@2")
 
 hospital.employees.append(employee1)
 hospital.employees.append(employee2)
+hospital.employees.append(employee3)
+hospital.patients.append(patient)
 
 #SUBMENUS
 def isNotNoneUpatedUser(userToUpdate):
@@ -43,7 +47,8 @@ def adminMenu(hospital, currentUser):
             userToUpdate = loginService.searchPatient(hospital, userToUpdateName)
             isNotNoneUpatedPatient(hospital, userToUpdate)
         elif option=="3":
-            print("proximamente...")
+            document = input("Ingrese el documento del paciente:\n")
+            userTypeValidator.getAppointmetData(hospital, document)
         elif option=="4":
             print("cerrando sesion...")
             return
@@ -54,7 +59,7 @@ def adminMenu(hospital, currentUser):
 def HumanResourcesMenu(hospital, currentUser):
     while True:
         print(f"Inicializando menu de recursos humanos: {currentUser.fullName}")
-        option=input("1. crear empleado \n2. cambiar rol de empleado \n3. eliminar empleado \n4. actualizar informacion de empleado\n5. ver a todos los empleados \n6. cerrar sesion\n")
+        option=input("1. crear empleado \n2. cambiar rol de empleado \n3. elimwinar empleado \n4. actualizar informacion de empleado\n5. ver a todos los empleados \n6. cerrar sesion\n")
         if option=="1":
             employeeTypeValidator.getEmployeeData(hospital)
         elif option=="2":

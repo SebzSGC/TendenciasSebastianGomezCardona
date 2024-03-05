@@ -3,9 +3,9 @@ import service.RolService.AdministrativePersonal as administrativePersonal
 def getPatientData(hospital):
     try:
         print("Por favor ingrese los datos del paciente:")
-        id = len(hospital.patients) + 1
+        id = input("Numero de documento: ")
         fullName = input("Nombre completo: ")
-        bornDate = input("Fecha de nacimiento (DD-MM-AAAA): ")
+        bornDate = input("Fecha de nacimiento (DD/MM/AAAA): ")
         genre = input("Género: ")
         address = input("Dirección: ")
         phoneNumber = input("Número de teléfono: ")
@@ -171,6 +171,16 @@ def validPatientData(hospital, userToUpdate):
             menuUpdateInsurance(hospital, userToUpdate)
         else:
             break
+
+def getAppointmetData(hospital, document):
+    try:
+        patient = administrativePersonal.validatePatientId(hospital, document)
+        doctor = input("Ingrese el nombre del doctor que atenderá al paciente: ")
+        treatingDoctor = administrativePersonal.validateDoctor(hospital, doctor)
+        date = input("Ingrese la fecha de la cita (dd/mm/yyyy):\n")
+        administrativePersonal.generateAppointment(hospital, patient, treatingDoctor, date)
+    except Exception as error:
+        print(str(error))
 
 def menuUpdateContactEmergency(hospital, userToUpdate):
     validContactEmergencyData(hospital, userToUpdate)

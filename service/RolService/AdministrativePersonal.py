@@ -1,4 +1,7 @@
-from model import User
+import datetime
+import validator.typeValidator as validator
+import model.User as User
+import model.MedicalAppointment as MedicalAppointment
 
 def validatePatientId(hospital, id):
     if hospital.patients == []:
@@ -6,7 +9,15 @@ def validatePatientId(hospital, id):
     for patient in hospital.patients:
         if patient.id == id:
             return patient
+    return None
+    
+def validateDoctor(hospital, name):
+    if hospital.employees == []:
         return None
+    for doctor in hospital.employees:
+        if doctor.fullName == name and doctor.rol == "Doctor":
+            return doctor
+    return None
 
 def createPatient(hospital, id, fullName, bornDate, genre, address, phoneNumber, email):
     patient = validatePatientId(hospital, id)
@@ -57,8 +68,15 @@ def updateMedicalInsurance(hospital, insurance, attribute, newInfo, oldAttribute
     setattr(insurance, attribute, newInfo)
     print(f"Informacion de la poliza del paciente: {oldAttribute} cambiado por {newInfo}, actualizacion con éxito")
 
-def generateAppointment():
-    pass
+def generateAppointment(hospital, patient, doctor, date):
+    if patient == None:
+        raise Exception("El paciente no existe")
+    if doctor == None:
+        raise Exception("El doctor no existe")
+    date = validator.validDate(date)
+    appointment = MedicalAppointment.MedicalAppointment(patient.id, doctor.fullName, date)
+    hospital.appointments.append(appointment)
+    print(f"Cita programada para el paciente: {patient.fullName}, el dia {date} con el doctor: {doctor.fullName}")
 
 def generateMedicalInsurance():
     pass
