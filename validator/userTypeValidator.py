@@ -1,4 +1,5 @@
 import service.RolService.AdministrativePersonal as administrativePersonal
+import service.RolService.Doctor as doctor
 
 def getPatientData(hospital):
     try:
@@ -179,6 +180,12 @@ def getAppointmetData(hospital, document):
         treatingDoctor = administrativePersonal.validateDoctor(hospital, doctor)
         date = input("Ingrese la fecha de la cita (dd/mm/yyyy):\n")
         administrativePersonal.generateAppointment(hospital, patient, treatingDoctor, date)
+    except Exception as error:
+        print(str(error))
+        
+def getClinicalHistoryData(hospital, patientDocument, doctorDocument):
+    try:
+        doctor.generateHistory(hospital,patientDocument,doctorDocument)
     except Exception as error:
         print(str(error))
 

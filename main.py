@@ -81,7 +81,20 @@ def HumanResourcesMenu(hospital, currentUser):
             continue
 
 def doctorMenu(hospital, currentUser):
-    print("Inicializando menu de doctor")
+    while True:
+        print(f"Inicializando menu de doctor: {currentUser.fullName}")
+        option=input("1. ver datos del paciente \n2. Generar historia clinica \n3. cerrar sesion\n")
+        if option=="1":
+            patientDocument = input("Ingrese el documento del paciente:\n")
+            userTypeValidator.getClinicalHistoryData(hospital, patientDocument, currentUser.idNumber)
+        elif option=="2":
+            pass
+        elif option=="3":
+            print("cerrando sesion...")
+            return
+        else:
+            print("opcion no valida")
+            continue
 
 def nurseMenu(hospital, currentUser):
     print("Inicializando menu de enfermera")
