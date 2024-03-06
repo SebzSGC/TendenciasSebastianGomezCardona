@@ -1,4 +1,4 @@
 class Procedure():
-    def __init__(self, name, idOrder):
+    def __init__(self, name, description):
         self.name = name
-        self.idOrder = idOrder
+        self.description = description

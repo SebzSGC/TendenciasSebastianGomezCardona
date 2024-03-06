@@ -1,7 +1,8 @@
 import datetime
 import validator.typeValidator as validator
 import model.User as User
-import model.MedicalAppointment as MedicalAppointment
+from model.MedicalAppointment import MedicalAppointment
+from model.Order import Order
 
 def validatePatientId(hospital, id):
     if hospital.patients == []:
@@ -74,7 +75,9 @@ def generateAppointment(hospital, patient, doctor, date):
     if doctor == None:
         raise Exception("El doctor no existe")
     date = validator.validDate(date)
-    appointment = MedicalAppointment.MedicalAppointment(patient.id, doctor.fullName, date)
+    appointment = MedicalAppointment(patient.id, doctor.idNumber, date)
+    order = Order(patient.id)
+    hospital.orders.append(order)
     hospital.appointments.append(appointment)
     print(f"Cita programada para el paciente: {patient.fullName}, el dia {date} con el doctor: {doctor.fullName}")
 

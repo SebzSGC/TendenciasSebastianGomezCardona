@@ -1,5 +1,5 @@
 class MedicalAppointment():
-    def __init__(self, idDocument, treatingDoctor, date):
-        self.idDocument = idDocument
-        self.treatingDoctor = treatingDoctor
+    def __init__(self, idPatient, idDoctor, date):
+        self.idPatient = idPatient
+        self.idDoctor = idDoctor
         self.date = date
