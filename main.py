@@ -97,7 +97,14 @@ def doctorMenu(hospital, currentUser):
             continue
 
 def nurseMenu(hospital, currentUser):
-    print("Inicializando menu de enfermera")
+    while True:
+        print(f"Inicializando menu de enfermera: {currentUser.fullName}")
+        option=input("1. ver datos del paciente \n2. Generar registro de visita\n3. cerrar sesion\n")
+        if option=="1":
+             pass
+        if option=="2":
+            patientDocument = input("Ingrese el documento del paciente:\n")
+            userTypeValidator.getVitalData(hospital, patientDocument)              
 
 def supportMenu(hospital, currentUser):
     print("Inicializando menu de soporte")

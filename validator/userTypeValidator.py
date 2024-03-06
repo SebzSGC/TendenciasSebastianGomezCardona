@@ -1,5 +1,6 @@
 import service.RolService.AdministrativePersonal as administrativePersonal
 import service.RolService.Doctor as doctor
+import service.RolService.Nurse as nurse
 
 def getPatientData(hospital):
     try:
@@ -189,6 +190,16 @@ def getClinicalHistoryData(hospital, patientDocument, doctorDocument):
     except Exception as error:
         print(str(error))
 
+def getVitalData(hospital, patientDocument):
+    try:
+        arterialPressure = input("Ingrese la presión arterial:\n")
+        temperature = input("Ingrese la temperatura:\n")
+        pulse = input("Ingrese el pulso:\n")
+        oxygenBloodLevel = input("Ingrese el nivel de oxígeno en la sangre:\n")
+        nurse.registerVitalDataForPatent(hospital, patientDocument, arterialPressure, temperature, pulse, oxygenBloodLevel)
+    except Exception as error:
+        print(str(error))
+    
 def menuUpdateContactEmergency(hospital, userToUpdate):
     validContactEmergencyData(hospital, userToUpdate)
 

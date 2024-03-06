@@ -5,3 +5,4 @@ class Hospital():
         self.orders=[]
         self.appointments=[]
         self.clinicalHistories={}
+        self.clinicalVisits=[]
