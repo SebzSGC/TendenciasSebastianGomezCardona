@@ -3,3 +3,7 @@
 
 # Directorios de caché de Python
 __pycache__/
+
+
+.vscode/
+```

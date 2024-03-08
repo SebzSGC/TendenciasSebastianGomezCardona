@@ -1,6 +1,8 @@
+from model.Procedure import Procedure
 from model.User import *
 from model.Employee import Employee
 from model.Hospital import Hospital
+from model.Medication import Medication
 from service import loginService
 from validator import userTypeValidator, typeValidator, employeeTypeValidator
 from service.RolService import AdministrativePersonal, Doctor, Nurse, HumanResources, InformationSupport
@@ -10,11 +12,16 @@ employee1 = Employee("John Doe", "123456789", "johndoe@example.com", "1234567890
 employee2 = Employee("sebastian", "123456789", "johndoe@example.com", "1234567890", "1990/01/01", "123 Main St", "Administrador", "sebz", "password")
 employee3 = Employee("doctor", "123456789", "johndoe@example.com", "1234567890", "1990/01/01", "123 Main St", "Doctor", "doctor", "doctor")
 patient = Patient("123","paciente","1990/03/02", "masculino", "123 Main St", "123456","test@2")
+medicina = Medication("1","pepa", 2500, "25gr")
+procedure = Procedure("1", "Cirugia de corazon", "Cirugia")
 
 hospital.employees.append(employee1)
 hospital.employees.append(employee2)
 hospital.employees.append(employee3)
 hospital.patients.append(patient)
+hospital.clinicalHistories["123"] = {}
+hospital.stockMedicine.append(medicina)
+hospital.procedures.append(procedure)
 
 #SUBMENUS
 def isNotNoneUpatedUser(userToUpdate):
@@ -59,7 +66,7 @@ def adminMenu(hospital, currentUser):
 def HumanResourcesMenu(hospital, currentUser):
     while True:
         print(f"Inicializando menu de recursos humanos: {currentUser.fullName}")
-        option=input("1. crear empleado \n2. cambiar rol de empleado \n3. elimwinar empleado \n4. actualizar informacion de empleado\n5. ver a todos los empleados \n6. cerrar sesion\n")
+        option=input("1. crear empleado \n2. cambiar rol de empleado \n3. eliminar empleado \n4. actualizar informacion de empleado\n5. ver a todos los empleados \n6. cerrar sesion\n")
         if option=="1":
             employeeTypeValidator.getEmployeeData(hospital)
         elif option=="2":
@@ -85,10 +92,10 @@ def doctorMenu(hospital, currentUser):
         print(f"Inicializando menu de doctor: {currentUser.fullName}")
         option=input("1. ver datos del paciente \n2. Generar historia clinica \n3. cerrar sesion\n")
         if option=="1":
+            pass
+        elif option=="2":
             patientDocument = input("Ingrese el documento del paciente:\n")
             userTypeValidator.getClinicalHistoryData(hospital, patientDocument, currentUser.idNumber)
-        elif option=="2":
-            pass
         elif option=="3":
             print("cerrando sesion...")
             return

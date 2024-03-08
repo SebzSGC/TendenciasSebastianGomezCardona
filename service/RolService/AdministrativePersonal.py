@@ -20,12 +20,21 @@ def validateDoctor(hospital, name):
             return doctor
     return None
 
+def validDoctorId(hospital, id):
+    if hospital.employees == []:
+        return None
+    for doctor in hospital.employees:
+        if doctor.idNumber == id and doctor.rol == "Doctor":
+            return doctor
+    return None
+
 def createPatient(hospital, id, fullName, bornDate, genre, address, phoneNumber, email):
     patient = validatePatientId(hospital, id)
     if patient:
         raise Exception("ya existe un paciente con esa cedula registrada")
     patient = User.Patient(id, fullName, bornDate, genre, address, phoneNumber, email)
     hospital.clinicalHistories[str(id)] = {} 
+    hospital.orders[str(id)] = {}
     hospital.patients.append(patient)
 
 def allDataCompletePatient(hospital, patient):

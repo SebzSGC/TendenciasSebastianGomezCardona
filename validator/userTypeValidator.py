@@ -1,3 +1,4 @@
+import datetime
 import service.RolService.AdministrativePersonal as administrativePersonal
 import service.RolService.Doctor as doctor
 import service.RolService.Nurse as nurse
@@ -186,7 +187,20 @@ def getAppointmetData(hospital, document):
         
 def getClinicalHistoryData(hospital, patientDocument, doctorDocument):
     try:
-        doctor.generateHistory(hospital,patientDocument,doctorDocument)
+        date = datetime.date.today().strftime("%d/%m/%Y")
+        consultReason = input("Ingrese el motivo de la consulta:\n")
+        symptomatology = input("Ingrese la sintomatologia:\n")
+        diagnosis = input("Ingrese el diagnostico:\n")
+        medicine = input("Ingrese el nombre del medicamento (N/A si no aplica):\n")
+        if medicine == "":
+            medicine = "N/A"
+        procedure = input("Ingrese el nombre del procedimiento (N/A si no aplica):\n")
+        if procedure == "":
+            procedure = "N/A"
+        helpDiagnostic = input("Ingrese el diagnostico de ayuda (N/A si no aplica):\n")
+        if helpDiagnostic == "":
+            helpDiagnostic = "N/A"
+        doctor.generateHistory(hospital,patientDocument,doctorDocument, procedure, medicine, helpDiagnostic, date, consultReason, symptomatology, diagnosis)
     except Exception as error:
         print(str(error))
 
