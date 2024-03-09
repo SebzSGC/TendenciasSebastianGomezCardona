@@ -185,8 +185,9 @@ def getAppointmetData(hospital, document):
     except Exception as error:
         print(str(error))
         
-def getClinicalHistoryData(hospital, patientDocument, doctorDocument):
+def getClinicalHistoryData(hospital, doctorDocument):
     try:
+        patientDocument = input("Ingrese el documento del paciente:\n")
         date = datetime.date.today().strftime("%d/%m/%Y")
         consultReason = input("Ingrese el motivo de la consulta:\n")
         symptomatology = input("Ingrese la sintomatologia:\n")
@@ -201,6 +202,24 @@ def getClinicalHistoryData(hospital, patientDocument, doctorDocument):
         if helpDiagnostic == "":
             helpDiagnostic = "N/A"
         doctor.generateHistory(hospital,patientDocument,doctorDocument, procedure, medicine, helpDiagnostic, date, consultReason, symptomatology, diagnosis)
+    except Exception as error:
+        print(str(error))
+
+def getAllPatientData(hospital):
+    try:
+        patientDocument = input("Ingrese el documento del paciente:\n")
+        while True:
+            print("¿Qué información deseas ver?")
+            attribute = input("1. Datos personales \n2. Historia clínica\n3. Regresar\n")
+            if attribute not in ["1", "2", "3"]:
+                print("Opción inválida")
+                continue
+            if attribute == "3":
+                break
+            if attribute == "1":
+                doctor.getPersonalPatientInfo(hospital, patientDocument)
+            if attribute == "2":
+                doctor.getPersonalClinicalHistory(hospital, patientDocument)
     except Exception as error:
         print(str(error))
 

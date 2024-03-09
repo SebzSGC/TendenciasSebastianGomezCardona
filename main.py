@@ -92,10 +92,9 @@ def doctorMenu(hospital, currentUser):
         print(f"Inicializando menu de doctor: {currentUser.fullName}")
         option=input("1. ver datos del paciente \n2. Generar historia clinica \n3. cerrar sesion\n")
         if option=="1":
-            pass
+            userTypeValidator.getAllPatientData(hospital)
         elif option=="2":
-            patientDocument = input("Ingrese el documento del paciente:\n")
-            userTypeValidator.getClinicalHistoryData(hospital, patientDocument, currentUser.idNumber)
+            userTypeValidator.getClinicalHistoryData(hospital, currentUser.idNumber)
         elif option=="3":
             print("cerrando sesion...")
             return
