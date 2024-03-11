@@ -7,3 +7,4 @@ class Hospital():
         self.stockMedicine=[]
         self.procedures=[]
         self.orders=[]
+        self.patientVisits=[]

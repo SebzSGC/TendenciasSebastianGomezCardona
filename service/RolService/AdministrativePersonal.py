@@ -34,7 +34,6 @@ def createPatient(hospital, id, fullName, bornDate, genre, address, phoneNumber,
         raise Exception("ya existe un paciente con esa cedula registrada")
     patient = User.Patient(id, fullName, bornDate, genre, address, phoneNumber, email)
     hospital.clinicalHistories[str(id)] = {} 
-    hospital.orders[str(id)] = {}
     hospital.patients.append(patient)
 
 def allDataCompletePatient(hospital, patient):
@@ -85,8 +84,6 @@ def generateAppointment(hospital, patient, doctor, date):
         raise Exception("El doctor no existe")
     date = validator.validDate(date)
     appointment = MedicalAppointment(patient.id, doctor.idNumber, date)
-    order = Order(patient.id)
-    hospital.orders.append(order)
     hospital.appointments.append(appointment)
     print(f"Cita programada para el paciente: {patient.fullName}, el dia {date} con el doctor: {doctor.fullName}")
 

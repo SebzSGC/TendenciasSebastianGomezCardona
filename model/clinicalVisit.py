@@ -1,7 +1,7 @@
 class ClinicalVisit():
-    def __init__(self, idPatient, idOrder, vitalData):
+    def __init__(self, idPatient, date, vitalData):
         self.idPatient = idPatient
-        self.idOrder = idOrder
+        self.date = date
+        self.medication = []
+        self.procedure = []
         self.vitalData = vitalData
-        self.medicine = []
-        self.procedures = []

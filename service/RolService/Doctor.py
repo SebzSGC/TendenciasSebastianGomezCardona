@@ -1,6 +1,4 @@
 import datetime
-from hmac import new
-from tabnanny import verbose
 from model.Medication import Medication
 import validator.typeValidator as typeValidator
 from service.RolService.AdministrativePersonal import validatePatientId, validDoctorId
@@ -19,12 +17,16 @@ def printClinicalHistory(history, indent=0):
             print("  " * indent + f"{key}: {value}")
 
 def getMedicine(hospital, medicine):
+    if medicine is None or medicine == "N/A":
+        return None
     for medication in hospital.stockMedicine:
         if medication.name == medicine:
             return medication
     return None
 
 def getProcedure(hospital, procedure):
+    if procedure is None or procedure == "N/A":
+        return None
     for procedures in hospital.procedures:
         if procedures.name == procedure:
             return procedures
@@ -77,22 +79,34 @@ def getPersonalClinicalHistory(hospital, patientDocument):
         history = hospital.clinicalHistories[patientDocument][chosenDate]
         printClinicalHistory(history)
 
+def getPersonalVisits(hospital, patientDocument):
+    patient = validatePatientId(hospital, patientDocument)
+    if not patient:
+        raise Exception("El paciente no existe")
+    if hospital.patientVisits == []:
+        print("El paciente no tiene visitas registradas")
+    print("Fechas disponibles:")
+    for visit in hospital.patientVisits:
+        print(visit.date)
+    chosenDate = input("Por favor, ingrese una fecha para visualizar:\n")
+    for visit in hospital.patientVisits:
+        if chosenDate == visit.date:
+            return visit
+    else:
+        raise Exception("La fecha seleccionada no está disponible. Por favor, elija una fecha válida.")
 
 def generateHistory(hospital, patientDocument, doctorDocument, procedure, medicine, helpDiagnostic, date, consultReason, symptomatology, diagnosis):
-    # Validate patient and doctor
     patient = validatePatientId(hospital, patientDocument)
     doc = validDoctorId(hospital, doctorDocument)
     
     if not (patient and doc):
         raise Exception("El documento del paciente o del doctor no es valido o no existe")
 
-    # Validate date
     try:
         typeValidator.validDate(date)
     except ValueError as e:
         raise Exception(str(e))
 
-    # Set default values if medicine or procedure are not valid
     medicine = getMedicine(hospital, medicine) if medicine != "N/A" else "N/A"
     procedure = getProcedure(hospital, procedure) if procedure != "N/A" else "N/A"
 
@@ -106,7 +120,6 @@ def generateHistory(hospital, patientDocument, doctorDocument, procedure, medici
         "order": None
     }
 
-    # Handle different scenarios for adding medication, procedure, or diagnostic
     if procedure is None and medicine is None and helpDiagnostic == "N/A":
         print(f"La historia clinica del paciente {patientDocument} ha sido generada con exito")
     else:
@@ -127,7 +140,6 @@ def generateHistory(hospital, patientDocument, doctorDocument, procedure, medici
         newClinicalHistory["order"] = vars(actualOrder)
         setOrderDetails(hospital, newClinicalHistory)
 
-    # Add clinical history to hospital records
     hospital.clinicalHistories[str(patientDocument)][date] = newClinicalHistory
     print(f"La historia clinica del paciente {patientDocument} ha sido generada con exito")
 

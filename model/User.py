@@ -10,7 +10,7 @@ class Patient():
         self.emergencyContact = None
         self.medicalInsurance = None
         self.clinicalHistory = None
-        self.order = None
+
 class EmergencyContact():
     def __init__(self, idUser, name, relationship, phoneNumber):
         self.idUser = idUser

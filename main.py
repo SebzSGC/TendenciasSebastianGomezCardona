@@ -1,3 +1,4 @@
+from model.Order import Order, OrderMedication, OrderProcedure
 from model.Procedure import Procedure
 from model.User import *
 from model.Employee import Employee
@@ -11,15 +12,47 @@ hospital = Hospital()
 employee1 = Employee("John Doe", "123456789", "johndoe@example.com", "1234567890", "1990/01/01", "123 Main St", "Recursos Humanos", "johndoe", "password")
 employee2 = Employee("sebastian", "123456789", "johndoe@example.com", "1234567890", "1990/01/01", "123 Main St", "Administrador", "sebz", "password")
 employee3 = Employee("doctor", "123456789", "johndoe@example.com", "1234567890", "1990/01/01", "123 Main St", "Doctor", "doctor", "doctor")
+employee4 = Employee("nurse", "123456789", "johndoe@example.com", "1234567890", "1990/01/01", "123 Main St", "Enfermera", "nurse", "nurse")
 patient = Patient("123","paciente","1990/03/02", "masculino", "123 Main St", "123456","test@2")
 medicina = Medication("1","pepa", 2500, "25gr")
 procedure = Procedure("1", "Cirugia de corazon", "Cirugia")
+actualOrder = Order("1", "123", "123456789", "09/03/2024")
+actualMedication = OrderMedication("1", "1", "2", "3", "2")
+actualOrder2 = Order("2", "123", "123456789", "10/03/2024")
+actualMedication2 = OrderMedication("2", "1", "2", "3", "2")
+actualProcedure2 = OrderProcedure("2", "1", "2", "3", False, None)
+order2 = vars(actualOrder2)
+order2["orderMedications"] = vars(actualMedication2)
+order2["orderProcedures"] = vars(actualProcedure2)
+newClinicalHistory2 = {
+        "Date": "10/03/2024",
+        "DoctorDocument": "123456789",
+        "consultReason": "consultReason",
+        "symptomatology": "symptomatology",
+        "diagnosis": "diagnosis",
+        "order": order2
+    }
+order = vars(actualOrder)
+order["orderMedications"] = vars(actualMedication)
+newClinicalHistory = {
+        "Date": "09/03/2024",
+        "DoctorDocument": "123456789",
+        "consultReason": "consultReason",
+        "symptomatology": "symptomatology",
+        "diagnosis": "diagnosis",
+        "order": order
+    }
 
+hospital.orders.append(order)
+hospital.orders.append(order2)
 hospital.employees.append(employee1)
 hospital.employees.append(employee2)
 hospital.employees.append(employee3)
+hospital.employees.append(employee4)
 hospital.patients.append(patient)
 hospital.clinicalHistories["123"] = {}
+hospital.clinicalHistories["123"]["09/03/2024"] = newClinicalHistory
+hospital.clinicalHistories["123"]["10/03/2024"] = newClinicalHistory2
 hospital.stockMedicine.append(medicina)
 hospital.procedures.append(procedure)
 
@@ -106,11 +139,13 @@ def nurseMenu(hospital, currentUser):
     while True:
         print(f"Inicializando menu de enfermera: {currentUser.fullName}")
         option=input("1. ver datos del paciente \n2. Generar registro de visita\n3. cerrar sesion\n")
+        if option=="3":
+            break
         if option=="1":
-             pass
+             userTypeValidator.getAllPatientData(hospital)
         if option=="2":
-            patientDocument = input("Ingrese el documento del paciente:\n")
-            userTypeValidator.getVitalData(hospital, patientDocument)              
+            userTypeValidator.getVitalData(hospital)
+                  
 
 def supportMenu(hospital, currentUser):
     print("Inicializando menu de soporte")

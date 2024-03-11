@@ -1,4 +1,5 @@
 import datetime
+from webbrowser import get
 import service.RolService.AdministrativePersonal as administrativePersonal
 import service.RolService.Doctor as doctor
 import service.RolService.Nurse as nurse
@@ -210,29 +211,39 @@ def getAllPatientData(hospital):
         patientDocument = input("Ingrese el documento del paciente:\n")
         while True:
             print("¿Qué información deseas ver?")
-            attribute = input("1. Datos personales \n2. Historia clínica\n3. Regresar\n")
-            if attribute not in ["1", "2", "3"]:
+            attribute = input("1. Datos personales \n2. Historia clínica\n3. Visitas Clinicas\n4. Regresar\n")
+            if attribute not in ["1", "2", "3", "4"]:
                 print("Opción inválida")
                 continue
-            if attribute == "3":
+            if attribute == "4":
                 break
             if attribute == "1":
                 doctor.getPersonalPatientInfo(hospital, patientDocument)
             if attribute == "2":
                 doctor.getPersonalClinicalHistory(hospital, patientDocument)
+            if attribute == "3":
+                visit = doctor.getPersonalVisits(hospital, patientDocument)    
+                nurse.print_all(visit)
     except Exception as error:
         print(str(error))
 
-def getVitalData(hospital, patientDocument):
+def getVitalData(hospital):
     try:
+        patientDocument = input("Ingrese el documento del paciente:\n")
         arterialPressure = input("Ingrese la presión arterial:\n")
         temperature = input("Ingrese la temperatura:\n")
         pulse = input("Ingrese el pulso:\n")
         oxygenBloodLevel = input("Ingrese el nivel de oxígeno en la sangre:\n")
-        nurse.registerVitalDataForPatent(hospital, patientDocument, arterialPressure, temperature, pulse, oxygenBloodLevel)
+        medication = input("Ingrese el nombre del medicamento aplicado:\n")
+        if medication == "":
+            medication = "N/A"
+        procedure = input("Ingrese el nombre del procedimiento aplicado:\n")
+        if procedure == "":
+            procedure = "N/A"
+        nurse.registerVitalDataForPatient(hospital, patientDocument, arterialPressure, temperature, pulse, oxygenBloodLevel, medication, procedure)
     except Exception as error:
         print(str(error))
-    
+              
 def menuUpdateContactEmergency(hospital, userToUpdate):
     validContactEmergencyData(hospital, userToUpdate)
 
