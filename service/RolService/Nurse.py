@@ -1,4 +1,5 @@
 import datetime
+from model.Order import Order, OrderMedication
 from model.User import VitalData
 from model.ClinicalVisit import ClinicalVisit
 from service.RolService.AdministrativePersonal import validatePatientId
@@ -31,45 +32,42 @@ def getOrdersProcedures(procedure, orders):
     for actualOrder in orders:
         if actualOrder.get("orderProcedures") == []:
             continue
-        orderProcedures = actualOrder.get("orderProcedures", [])  # Obtener el vector de orderMedications para el elemento actual
+        orderProcedures = actualOrder.get("orderProcedures", []) 
         if orderProcedures["idProcedure"] == procedure.id:
             order.append(orderProcedures)
     if order == []: 
         raise Exception("El procedimiento no existe en ninguna orden")
     return order
 
- 
-def registerVitalDataForPatient(hospital,idUser,arterialPressure,temperature,pulse,bloodOxygenLevel, medication, procedure):
-    if validatePatientId(hospital, idUser) == None:
+def registerVitalDataForPatient(hospital, idUser, arterialPressure, temperature, pulse, bloodOxygenLevel, medication, procedure):
+    if not validatePatientId(hospital, idUser):
         raise Exception("El paciente no existe")
-    
+
     medication = getMedicine(hospital, medication)
     procedure = getProcedure(hospital, procedure)
-    
+
     orders = getOrdersByIdPatient(hospital, idUser)
-    orderMedication = None
-    orderProcedure = None
-    if orders != [] and medication is not None:                
-        orderMedication = getOrdersMedication(medication, orders)
-    if orders != [] and procedure is not None:
-        orderProcedure = getOrdersProcedures(procedure, orders)
-    if orderMedication is None:
-        orderMedication = "N/A"
-    if orderProcedure is None:
-        orderProcedure = "N/A"
-    vitalData = VitalData(idUser,arterialPressure,temperature,pulse,bloodOxygenLevel)
-    date = datetime.date.today().strftime("%d/%m/%Y")
+    orderMedication = getOrdersMedication(medication, orders) if orders and medication else None
+    orderProcedure = getOrdersProcedures(procedure, orders) if orders and procedure else None
+
+    vitalData = VitalData(idUser, arterialPressure, temperature, pulse, bloodOxygenLevel)
+    date = datetime.datetime.today().strftime("%d/%m/%Y %H:%M")
     clinicalVisit = ClinicalVisit(idUser, date, vitalData)
 
-    print("IDs de ordenes que contienen el medicamento administrado:")
-    clinicalVisit.medication = selectDictionaryByOrderId(orderMedication)
-    print("IDs de ordenes que contienen el procedimiento realizado:")
-    clinicalVisit.procedure = selectDictionaryByOrderId(orderProcedure)
+    clinicalVisit.medication = selectDictionaryByOrderId(orderMedication) if orderMedication else "N/A"
+    clinicalVisit.procedure = selectDictionaryByOrderId(orderProcedure) if orderProcedure else "N/A"
+
     hospital.patientVisits.append(clinicalVisit)
+    print("Datos de la visita clinica registrados exitosamente")
+
 
 def selectDictionaryByOrderId(vectors):
     if vectors is None or vectors == [] or vectors == "N/A":
         return "N/A"
+    if 'idMedication' in vectors[0]:
+        print("IDs de ordenes que contienen el medicamento suministrado, porfavor elija la correcta.")
+    else:
+        print("IDs de ordenes que contienen el procedimiento realizado, porfavor elija la correcta:")
     id_positions = {vector["idOrder"]: idx for idx, vector in enumerate(vectors)}
     for id_order in id_positions.keys():
         print(f"Orden #{id_order} = {id_order}")

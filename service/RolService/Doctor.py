@@ -88,12 +88,12 @@ def getPersonalVisits(hospital, patientDocument):
     print("Fechas disponibles:")
     for visit in hospital.patientVisits:
         print(visit.date)
-    chosenDate = input("Por favor, ingrese una fecha para visualizar:\n")
+    chosenDate = input("Por favor, ingrese una fecha con la hora para visualizar:\n")
     for visit in hospital.patientVisits:
         if chosenDate == visit.date:
             return visit
     else:
-        raise Exception("La fecha seleccionada no está disponible. Por favor, elija una fecha válida.")
+        print("La fecha seleccionada no está disponible. Por favor, elija una fecha con la hora válida.")
 
 def generateHistory(hospital, patientDocument, doctorDocument, procedure, medicine, helpDiagnostic, date, consultReason, symptomatology, diagnosis):
     patient = validatePatientId(hospital, patientDocument)
