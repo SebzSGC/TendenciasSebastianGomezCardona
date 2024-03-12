@@ -17,10 +17,10 @@ patient = Patient("123","paciente","1990/03/02", "masculino", "123 Main St", "12
 medicina = Medication("1","pepa", 2500, "25gr")
 procedure = Procedure("1", "Cirugia de corazon", "Cirugia")
 actualOrder = Order("1", "123", "123456789", "09/03/2024")
-actualMedication = OrderMedication("1", "1", "2", "3", "2")
+actualMedication = OrderMedication("1", "1", "2", "3", "2","1")
 actualOrder2 = Order("2", "123", "123456789", "10/03/2024")
-actualMedication2 = OrderMedication("2", "1", "2", "3", "2")
-actualProcedure2 = OrderProcedure("2", "1", "2", "3", False, None)
+actualMedication2 = OrderMedication("2", "1", "2", "3", "2","1") 
+actualProcedure2 = OrderProcedure("2", "1", "2", "3", False, None, "1")
 order2 = vars(actualOrder2)
 order2["orderMedications"] = vars(actualMedication2)
 order2["orderProcedures"] = vars(actualProcedure2)
@@ -75,7 +75,7 @@ def isNotNoneUpatedPatient(hospital, userToUpdate):
 def adminMenu(hospital, currentUser):
     print(f"Inicializando menu de administrador: {currentUser.fullName}")
     while True:
-        option=input("1. Registrar paciente \n2. Actualizar paciente\n3. Programar cita\n4. cerrar sesion\n")
+        option=input("1. Registrar paciente \n2. Actualizar paciente\n3. Programar cita\n4. Generar factura\n5. cerrar sesion\n")
         if option=="1":
             userTypeValidator.getPatientData(hospital)
             newPatient = hospital.patients[-1]
@@ -90,6 +90,9 @@ def adminMenu(hospital, currentUser):
             document = input("Ingrese el documento del paciente:\n")
             userTypeValidator.getAppointmetData(hospital, document)
         elif option=="4":
+            print("cerrando sesion...")
+            return
+        elif option=="5":
             print("cerrando sesion...")
             return
         else:
@@ -150,9 +153,6 @@ def nurseMenu(hospital, currentUser):
 def supportMenu(hospital, currentUser):
     print("Inicializando menu de soporte")
 
-def userMenu(hospital, currentUser):
-    print("Inicializando menu de usuario")
-
 #RUTAS DE MENUS
 def loginRouter(hospital,currentUser):
     if isinstance(currentUser, Employee):
@@ -166,8 +166,6 @@ def loginRouter(hospital,currentUser):
             supportMenu(hospital,currentUser)
         elif currentUser.rol=="Recursos Humanos":
             HumanResourcesMenu(hospital,currentUser)
-    elif isinstance(currentUser, Patient):
-        userMenu(hospital,currentUser)
 
 initialMenu="1. iniciar sesion\n0. cerrar programa\n"
 while True:

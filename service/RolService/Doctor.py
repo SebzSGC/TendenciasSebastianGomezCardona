@@ -1,20 +1,28 @@
-import datetime
 from model.Medication import Medication
 import validator.typeValidator as typeValidator
 from service.RolService.AdministrativePersonal import validatePatientId, validDoctorId
 import model.Order as Order
 
-def printClinicalHistory(history, indent=0):
-    for key, value in history.items():
+def printDictItem(item, indent):
+    indentation = "  " * indent
+    for key, value in item.items():
         if isinstance(value, dict):
-            print("  " * indent + f"{key}:")
-            printClinicalHistory(value, indent + 1)
+            print(f"{indentation}{key}:")
+            printDictItem(value, indent + 1)
         elif isinstance(value, list):
-            print("  " * indent + f"{key}:")
-            for item in value:
-                printClinicalHistory(item, indent + 1)
+            print(f"{indentation}{key}:")
+            printListItems(value, indent + 1)
         else:
-            print("  " * indent + f"{key}: {value}")
+            print(f"{indentation}{key}: {value}")
+
+def printListItems(items, indent):
+    indentation = "  " * indent
+    for idx, item in enumerate(items):
+        print(f"{indentation}Item {idx + 1}:")
+        printDictItem(item, indent + 1)
+
+def printClinicalHistory(history):
+    printDictItem(history, 0)
 
 def getMedicine(hospital, medicine):
     if medicine is None or medicine == "N/A":
@@ -110,7 +118,6 @@ def generateHistory(hospital, patientDocument, doctorDocument, procedure, medici
     medicine = getMedicine(hospital, medicine) if medicine != "N/A" else "N/A"
     procedure = getProcedure(hospital, procedure) if procedure != "N/A" else "N/A"
 
-    # Create clinical history
     newClinicalHistory = {
         "Date": date,
         "DoctorDocument": doctorDocument,
@@ -129,12 +136,12 @@ def generateHistory(hospital, patientDocument, doctorDocument, procedure, medici
         if helpDiagnostic != "N/A" and procedure == "N/A" and medicine == "N/A":
             handleDiagnostic(actualOrder)
         elif helpDiagnostic == "N/A" and procedure == "N/A" and medicine != "N/A":
-            handleMedication(actualOrder, medicine)
+            handleMedication(actualOrder, medicine, hospital)
         elif helpDiagnostic == "N/A" and medicine == "N/A" and procedure != "N/A":
-            handleProcedure(actualOrder, procedure)
+            handleProcedure(actualOrder, procedure, hospital)
         elif procedure != "N/A" and medicine != "N/A" and helpDiagnostic == "N/A":
-            handleMedication(actualOrder, medicine)
-            handleProcedure(actualOrder, procedure)
+            handleMedication(actualOrder, medicine, hospital)
+            handleProcedure(actualOrder, procedure, hospital)
         else:
             raise Exception("No se puede agregar una ayuda diagnostica si se esta asignando un procedimiento o medicamento")
         newClinicalHistory["order"] = vars(actualOrder)
@@ -154,35 +161,52 @@ def handleDiagnostic(actualOrder):
     print(f"La historia clinica del paciente {actualOrder.idPatient} ha sido generada con exito")
     print(f"Ayuda diagnostica agregada a la orden #{actualOrder.id}")
 
-def handleMedication(actualOrder, medicine):
-    idMedicine = medicine.id
-    dose = input("Ingrese la dosis:\n")
-    treatmentDuration = input("Ingrese la duración del tratamiento:\n")
-    amount = input("Ingrese la cantidad:\n")
-    actualMedication = Order.OrderMedication(actualOrder.id, idMedicine, dose, treatmentDuration, amount)
-    actualOrder.orderMedications.append(actualMedication)
-    print(f"La orden #{actualOrder.id} del paciente se le ha asignado el medicamento {medicine.name} y sus respectivos datos con exito")
+def handleMedication(actualOrder, medicine, hospital):
+    while True:
+        item = len(actualOrder.orderMedications) + 1
+        idMedicine = medicine.id
+        dose = input("Ingrese la dosis del medicamento:\n")
+        treatmentDuration = input("Ingrese la duración del tratamiento:\n")
+        amount = medicine.price
+        actualMedication = Order.OrderMedication(actualOrder.id, idMedicine, dose, treatmentDuration, amount, item)
+        actualOrder.orderMedications.append(actualMedication)
+        print(f"La orden #{actualOrder.id} del paciente se le ha asignado el medicamento {medicine.name} y sus respectivos datos con exito")
+        if input("Desea agregar otro medicamento? (si/no)\n").lower() == "no":
+            break
+        medicine = input("Ingrese el nombre del medicamento:\n")
+        medicine = getMedicine(hospital, medicine)
+        if medicine is None:
+            print("El medicamento no existe")
+            break
 
-def handleProcedure(actualOrder, procedure):
-    idProcedure = procedure.id
-    amount = input("Ingrese la cantidad:\n")
-    frequency = input("Ingrese la frecuencia:\n")
-    specialAssistance = input("Requiere de asistencia por especialista:\n").lower() == "si"
-    idSpecialist = input("Ingrese el id del especialista:\n") if specialAssistance else None
-
-    actualProcedure = Order.OrderProcedure(actualOrder.id, idProcedure, amount, frequency, specialAssistance, idSpecialist)
-    actualOrder.orderProcedures.append(actualProcedure)
-    print(f"La orden #{actualOrder.id} del paciente se le ha asignado el procedimiento {procedure.name} y sus respectivos datos con exito")
-
+def handleProcedure(actualOrder, procedure, hospital):
+    while True:
+        item = len(actualOrder.orderProcedures) + 1
+        idProcedure = procedure.id
+        amount = input("Ingrese la cantidad del procedimiento:\n")
+        frequency = input("Ingrese la frecuencia del procedimiento:\n")
+        specialAssistance = input("Requiere de asistencia por especialista:\n").lower() == "si"
+        idSpecialist = input("Ingrese el id del especialista:\n") if specialAssistance else None
+        actualProcedure = Order.OrderProcedure(actualOrder.id, idProcedure, amount, frequency, specialAssistance, idSpecialist, item)
+        actualOrder.orderProcedures.append(actualProcedure)
+        print(f"La orden #{actualOrder.id} del paciente se le ha asignado el procedimiento {procedure.name} y sus respectivos datos con exito")
+        if input("Desea agregar otro procedimiento? (si/no)\n").lower() == "no":
+            break
+        procedure = input("Ingrese el nombre del procedimiento:\n")
+        procedure = getProcedure(hospital, procedure)
+        if procedure is None:
+            print("El procedimiento no existe")
+            break
+        
 def setOrderDetails(hospital, newClinicalHistory):
     order = newClinicalHistory["order"]
     if order["orderMedications"]:
-        for medicationOrder in order["orderMedications"]:
-            order["orderMedications"] = vars(medicationOrder)
+        for index, medicationOrder in enumerate(order["orderMedications"]):
+            order["orderMedications"][index] = (vars(medicationOrder)) 
     if order["orderProcedures"]:
-        for procedureOrder in order["orderProcedures"]:
-            order["orderProcedures"] = vars(procedureOrder)
+        for index, procedureOrder in enumerate(order["orderProcedures"]):
+            order["orderProcedures"][index] = (vars(procedureOrder))
     if order["orderHelpDiagnostics"]:
-        for diagnosticOrder in order["orderHelpDiagnostics"]:
-            order["orderHelpDiagnostics"] = vars(diagnosticOrder)
+        for index, diagnosticOrder in enumerate(order["orderHelpDiagnostics"]):
+            order["orderHelpDiagnostics"][index] = (vars(diagnosticOrder)) 
     hospital.orders.append(order)
