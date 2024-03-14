@@ -83,6 +83,7 @@ def allDataCompletePatient(hospital, patient):
 
 def createEmergencyContact(hospital, idUser, name, relationship, phoneNumber):
     patient = validatePatientId(hospital, idUser)
+    typeValidator.validPhoneNumber(phoneNumber)
     if not patient:
         raise Exception("El paciente no existe")
     contact = User.EmergencyContact(idUser, name, relationship, phoneNumber)
