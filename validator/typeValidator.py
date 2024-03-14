@@ -18,6 +18,21 @@ def validGenre(newGenre):
     }
     return genreOptions.get(newGenre, "Opción inválida")
 
+def getCorrectAge(bornDate):
+
+    bornDate = datetime.datetime.strptime(bornDate, "%d/%m/%Y")
+    actualDate = datetime.datetime.today()
+    age = actualDate.year - bornDate.year
+    if (actualDate.month, actualDate.day) < (bornDate.month, bornDate.day):
+        age -= 1
+    return age
+
+def getValidityPolicy(datePolicyValidity):
+    datePolicyValidity = datetime.datetime.strptime(datePolicyValidity, "%d/%m/%Y")
+    actualDate = datetime.datetime.today()
+    validity = actualDate - datePolicyValidity
+    return validity.days
+
 def validDate(date):
     try:
         date_objt = datetime.datetime.strptime(date, '%d/%m/%Y')

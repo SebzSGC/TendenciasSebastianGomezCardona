@@ -9,23 +9,27 @@ from validator import userTypeValidator, typeValidator, employeeTypeValidator
 from service.RolService import AdministrativePersonal, Doctor, Nurse, HumanResources, InformationSupport
 
 hospital = Hospital()
-employee1 = Employee("John Doe", "123456789", "johndoe@example.com", "1234567890", "1990/01/01", "123 Main St", "Recursos Humanos", "johndoe", "password")
-employee2 = Employee("sebastian", "123456789", "johndoe@example.com", "1234567890", "1990/01/01", "123 Main St", "Administrador", "sebz", "password")
-employee3 = Employee("doctor", "123456789", "johndoe@example.com", "1234567890", "1990/01/01", "123 Main St", "Doctor", "doctor", "doctor")
-employee4 = Employee("nurse", "123456789", "johndoe@example.com", "1234567890", "1990/01/01", "123 Main St", "Enfermera", "nurse", "nurse")
-patient = Patient("123","paciente","1990/03/02", "masculino", "123 Main St", "123456","test@2")
+EmergencyContact1 = EmergencyContact("123", "Juan Perez", "Padre", "1234567890")
+MedicalInsurance1 = MedicalInsurance("123", "Sura", "123456789", "Activo", "13/03/2024")
+employee1 = Employee("John Doe", "123456789", "johndoe@example.com", "1234567890", "27/02/2004", "123 Main St", "Recursos Humanos", "johndoe", "password")
+employee2 = Employee("sebastian", "123456789", "johndoe@example.com", "1234567890", "27/02/2004", "123 Main St", "Administrador", "sebz", "password")
+employee3 = Employee("doctor", "123456789", "johndoe@example.com", "1234567890", "27/02/2004", "123 Main St", "Doctor", "doctor", "doctor")
+employee4 = Employee("nurse", "123456789", "johndoe@example.com", "1234567890", "27/02/2004", "123 Main St", "Enfermera", "nurse", "nurse")
+patient = Patient("123","paciente","27/02/2004", "masculino", "123 Main St", "123456","test@2")
+patient.emergencyContact = EmergencyContact1
+patient.medicalInsurance = MedicalInsurance1
 medicina = Medication("1","pepa", 2500, "25gr")
 procedure = Procedure("1", "Cirugia de corazon", "Cirugia")
 actualOrder = Order("1", "123", "123456789", "09/03/2024")
 actualMedication = OrderMedication("1", "1", "2", "3", "2","1")
-actualOrder2 = Order("2", "123", "123456789", "10/03/2024")
+actualOrder2 = Order("2", "123", "123456789", "13/03/2024")
 actualMedication2 = OrderMedication("2", "1", "2", "3", "2","1") 
 actualProcedure2 = OrderProcedure("2", "1", "2", "3", False, None, "1")
 order2 = vars(actualOrder2)
 order2["orderMedications"] = vars(actualMedication2)
 order2["orderProcedures"] = vars(actualProcedure2)
 newClinicalHistory2 = {
-        "Date": "10/03/2024",
+        "Date": "13/03/2024",
         "DoctorDocument": "123456789",
         "consultReason": "consultReason",
         "symptomatology": "symptomatology",
@@ -52,7 +56,7 @@ hospital.employees.append(employee4)
 hospital.patients.append(patient)
 hospital.clinicalHistories["123"] = {}
 hospital.clinicalHistories["123"]["09/03/2024"] = newClinicalHistory
-hospital.clinicalHistories["123"]["10/03/2024"] = newClinicalHistory2
+hospital.clinicalHistories["123"]["13/03/2024"] = newClinicalHistory2
 hospital.stockMedicine.append(medicina)
 hospital.procedures.append(procedure)
 
@@ -90,8 +94,8 @@ def adminMenu(hospital, currentUser):
             document = input("Ingrese el documento del paciente:\n")
             userTypeValidator.getAppointmetData(hospital, document)
         elif option=="4":
-            print("cerrando sesion...")
-            return
+            document = input("Ingrese el documento del paciente:\n")
+            userTypeValidator.getInvoiceData(hospital, document)
         elif option=="5":
             print("cerrando sesion...")
             return

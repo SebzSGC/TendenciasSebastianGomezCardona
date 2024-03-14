@@ -243,6 +243,16 @@ def getVitalData(hospital):
     except Exception as error:
         print(str(error))
               
+def getInvoiceData(hospital, document):
+    try:
+        patient = administrativePersonal.validatePatientId(hospital, document)
+        if patient == None:
+            raise Exception("El paciente no existe")
+        appointment = doctor.getAppointmentsByPatient(hospital, document)
+        administrativePersonal.generateInvoice(hospital, patient, appointment)
+    except Exception as error:
+        print(str(error))
+        
 def menuUpdateContactEmergency(hospital, userToUpdate):
     validContactEmergencyData(hospital, userToUpdate)
 
