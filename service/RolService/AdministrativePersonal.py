@@ -129,7 +129,12 @@ def generateInvoice(hospital, patient, appointment):
     idDoctor = appointment["DoctorDocument"]
     invoice = Invoice(appointment, patient)
     doctor = validDoctorId(hospital, idDoctor)
-    print(f"Factura generada para el paciente: {patient.fullName}, con la cita: {appointment["Date"]}")
+    printInvoiceDetails(invoice, doctor)
+    totalToPay = calculateTotalToPay(hospital, invoice, totalToPay)
+    printTotalToPay(invoice, totalToPay)
+
+def printInvoiceDetails(invoice, doctor):
+    print(f"Factura generada para el paciente: {invoice.patient.fullName}, con la cita: {invoice.medicalAppointment['Date']}")
     print("Nombre del paciente: ",invoice.patient.fullName)
     print("Edad del paciente: ", typeValidator.getCorrectAge(invoice.patient.bornDate))
     print("Cedula del paciente", invoice.patient.id)
@@ -138,32 +143,41 @@ def generateInvoice(hospital, patient, appointment):
     print("Numero de poliza del paciente: ", invoice.patient.medicalInsurance.policyNumber)
     print("Dias de vigencia de la poliza: ", typeValidator.getValidityPolicy(invoice.patient.medicalInsurance.policyValidity))
     print("Fecha de la finalizacion de la poliza: ", invoice.patient.medicalInsurance.policyValidity)
+
+def calculateTotalToPay(hospital, invoice, totalToPay):
     if invoice.medicalAppointment["order"]["orderMedications"]:
         print("Medicamentos: ")
-        for medication in invoice.medicalAppointment["order"]["orderMedications"]:
-            if medication == "idMedication":
-                infoMedicine = getMedicineById(hospital, invoice.medicalAppointment["order"]["orderMedications"]["item"])
-                print(" item: ", invoice.medicalAppointment["order"]["orderMedications"]["item"])
-                print("     Medicamento: ", infoMedicine.name)
-                print("     Cantidad: ", infoMedicine.dosage)
-                print("     Precio: ", infoMedicine.price)
-                totalToPay += infoMedicine.price
-            continue    
+        totalToPay = calculateTotalForMedications(hospital, invoice, totalToPay)
     else:
         print("No se recetaron medicamentos")
 
     if invoice.medicalAppointment["order"]["orderProcedures"]:
         print("Procedimientos: ")
-        for procedure in invoice.medicalAppointment["order"]["orderProcedures"]:
-            if procedure == "idProcedure":
-                infoProcedure = getProcedureById(hospital, invoice.medicalAppointment["order"]["orderProcedures"]["item"])
-                print(" item: ", invoice.medicalAppointment["order"]["orderProcedures"]["item"])
-                print("     Procedimiento: ", infoProcedure.name)
-                print("     Descripcion: ", infoProcedure.description)
-            continue
+        calculateTotalForProcedures(hospital, invoice)
     else:
         print("No se programaron procedimientos")
+    return totalToPay
 
+def calculateTotalForMedications(hospital, invoice, totalToPay):
+    for medication in invoice.medicalAppointment["order"]["orderMedications"]:
+        if medication == "idMedication":
+            infoMedicine = getMedicineById(hospital, invoice.medicalAppointment["order"]["orderMedications"]["item"])
+            print(" item: ", invoice.medicalAppointment["order"]["orderMedications"]["item"])
+            print("     Medicamento: ", infoMedicine.name)
+            print("     Cantidad: ", infoMedicine.dosage)
+            print("     Precio: ", infoMedicine.price)
+            totalToPay += infoMedicine.price
+    return totalToPay
+
+def calculateTotalForProcedures(hospital, invoice):
+    for procedure in invoice.medicalAppointment["order"]["orderProcedures"]:
+        if procedure == "idProcedure":
+            infoProcedure = getProcedureById(hospital, invoice.medicalAppointment["order"]["orderProcedures"]["item"])
+            print(" item: ", invoice.medicalAppointment["order"]["orderProcedures"]["item"])
+            print("     Procedimiento: ", infoProcedure.name)
+            print("     Descripcion: ", infoProcedure.description)
+
+def printTotalToPay(invoice, totalToPay):
     if invoice.patient.medicalInsurance.policyState == True:
         print("El paciente cuenta con seguro medico")
         print("Copago de: $", 50000)
