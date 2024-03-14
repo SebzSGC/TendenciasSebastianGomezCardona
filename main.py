@@ -10,7 +10,7 @@ from service.RolService import AdministrativePersonal, Doctor, Nurse, HumanResou
 
 hospital = Hospital()
 EmergencyContact1 = EmergencyContact("123", "Juan Perez", "Padre", "1234567890")
-MedicalInsurance1 = MedicalInsurance("123", "Sura", "123456789", "Activo", "13/03/2024")
+MedicalInsurance1 = MedicalInsurance("123", "Sura", "123456789", True, "13/03/2024")
 employee1 = Employee("John Doe", "123456789", "johndoe@example.com", "1234567890", "27/02/2004", "123 Main St", "Recursos Humanos", "johndoe", "password")
 employee2 = Employee("sebastian", "123456789", "johndoe@example.com", "1234567890", "27/02/2004", "123 Main St", "Administrador", "sebz", "password")
 employee3 = Employee("doctor", "123456789", "johndoe@example.com", "1234567890", "27/02/2004", "123 Main St", "Doctor", "doctor", "doctor")

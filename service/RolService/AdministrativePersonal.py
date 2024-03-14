@@ -164,8 +164,7 @@ def generateInvoice(hospital, patient, appointment):
         print("Copago de: $", 50000)
         print("Precio por medicamentos: ", totalToPay)
         print("Total a pagar: ", 50000)
-        
-    if invoice.patient.medicalInsurance.policyState == False:
+    else:    
         print("El paciente no cuenta con seguro medico")
         print("Precio por medicamentos: ", totalToPay)
         print("Total a pagar: ", totalToPay)

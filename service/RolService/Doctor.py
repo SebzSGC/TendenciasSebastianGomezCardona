@@ -151,12 +151,16 @@ def generateHistory(hospital, patientDocument, doctorDocument, procedure, medici
     print(f"La historia clinica del paciente {patientDocument} ha sido generada con exito")
 
 def handleDiagnostic(actualOrder):
+    item = len(actualOrder.orderHelpDiagnostics) + 1
     nameHelpDiagnostic = input("Ingrese el nombre del diagnostico de ayuda:\n")
     quantity = input("Ingrese la cantidad:\n")
     amount = input("Ingrese el valor:\n")
     specialAssistance = input("Requiere de asistencia por especialista:\n").lower() == "si"
-    idSpecialist = input("Ingrese el id del especialista:\n") if specialAssistance else None
-    actualDiagnostic = Order.OrderHelpDiagnostic(actualOrder.id, nameHelpDiagnostic, quantity, amount, specialAssistance, idSpecialist)
+    if specialAssistance:
+            idSpecialist = setSpecialist()
+    else:
+        idSpecialist = None
+    actualDiagnostic = Order.OrderHelpDiagnostic(actualOrder.id, nameHelpDiagnostic, quantity, amount, specialAssistance, idSpecialist, item)
     actualOrder.orderHelpDiagnostics.append(actualDiagnostic)
     print(f"La historia clinica del paciente {actualOrder.idPatient} ha sido generada con exito")
     print(f"Ayuda diagnostica agregada a la orden #{actualOrder.id}")
@@ -185,8 +189,11 @@ def handleProcedure(actualOrder, procedure, hospital):
         idProcedure = procedure.id
         amount = input("Ingrese la cantidad del procedimiento:\n")
         frequency = input("Ingrese la frecuencia del procedimiento:\n")
-        specialAssistance = input("Requiere de asistencia por especialista:\n").lower() == "si"
-        idSpecialist = input("Ingrese el id del especialista:\n") if specialAssistance else None
+        specialAssistance = input("¿Requiere de asistencia por especialista? (si/no)\n").lower() == "si"
+        if specialAssistance:
+            idSpecialist = setSpecialist()
+        else:
+            idSpecialist = None
         actualProcedure = Order.OrderProcedure(actualOrder.id, idProcedure, amount, frequency, specialAssistance, idSpecialist, item)
         actualOrder.orderProcedures.append(actualProcedure)
         print(f"La orden #{actualOrder.id} del paciente se le ha asignado el procedimiento {procedure.name} y sus respectivos datos con exito")
@@ -198,6 +205,23 @@ def handleProcedure(actualOrder, procedure, hospital):
             print("El procedimiento no existe")
             break
         
+def setSpecialist():
+
+    inventorySpecialists = {
+        "Especialista 1": "123",
+        "Especialista 2": "456",
+        "Especialista 3": "789"
+    }
+
+    print("Especialistas disponibles:")
+    for specialistName in inventorySpecialists:
+        print(f"- {specialistName}")
+    selectedSpecialist = input("Ingrese el nombre del especialista:\n")
+    if selectedSpecialist not in inventorySpecialists:
+        raise Exception("El especialista no existe")
+    idSpecialist = inventorySpecialists.get(selectedSpecialist)
+    return idSpecialist
+
 def setOrderDetails(hospital, newClinicalHistory):
     order = newClinicalHistory["order"]
     if order["orderMedications"]:
