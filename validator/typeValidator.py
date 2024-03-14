@@ -19,7 +19,6 @@ def validGenre(newGenre):
     return genreOptions.get(newGenre, "Opción inválida")
 
 def getCorrectAge(bornDate):
-
     bornDate = datetime.datetime.strptime(bornDate, "%d/%m/%Y")
     actualDate = datetime.datetime.today()
     age = actualDate.year - bornDate.year
@@ -35,12 +34,25 @@ def getValidityPolicy(datePolicyValidity):
 
 def validDate(date):
     try:
-        date_objt = datetime.datetime.strptime(date, '%d/%m/%Y')
-        correctDate = date_objt.strftime('%d/%m/%Y')
+        dateObjt = datetime.datetime.strptime(date, '%d/%m/%Y')
+        correctDate = dateObjt.strftime('%d/%m/%Y')
         return correctDate
     except ValueError:
         raise ValueError("Formato de fecha inválido, por favor ingrese la fecha en el formato dd/mm/yyyy")
     
+
+def validDateAndAge(fecha):
+    try:
+        dateObjt = datetime.strptime(fecha, '%d/%m/%Y')
+        actualDate = datetime.now()
+        difference = actualDate.year - dateObjt.year
+        if 0 <= difference <= 150:
+            return True
+        else:
+            raise Exception("Edad ingresada no valida")
+    except ValueError:
+        raise Exception("Formato de fecha inválido")
+
 def validEmail(email):
     if "@" in email and "." in email:
         return
