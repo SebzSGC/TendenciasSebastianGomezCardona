@@ -13,6 +13,8 @@ def createEmployee(hospital, fullName, idNumber, email, phoneNumber, bornDate, a
     typeValidator.validEmail(email)
     typeValidator.validPhoneNumber(phoneNumber)
     typeValidator.validDateAndAge(bornDate)
+    if len(adress) > 30:
+        raise Exception("Dirección muy larga")
     if employee:
         raise Exception("ya existe un empleado con esa cedula registrada")
     employee = Employee(fullName, idNumber, email, phoneNumber, bornDate, adress, rol, userName, password)
