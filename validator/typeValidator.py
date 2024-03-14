@@ -42,9 +42,9 @@ def validDate(date):
         raise ValueError("Formato de fecha inválido, por favor ingrese la fecha en el formato dd/mm/yyyy")
     
 
-def validDateAndAge(fecha):
+def validDateAndAge(date):
     try:
-        dateObjt = datetime.strptime(fecha, '%d/%m/%Y')
+        dateObjt = datetime.datetime.strptime(date, '%d/%m/%Y')
         actualDate = datetime.now()
         difference = actualDate.year - dateObjt.year
         if 0 <= difference <= 150:
