@@ -1,0 +1,9 @@
+# Archivos compilados de Python
+*.pyc
+
+# Directorios de caché de Python
+__pycache__/
+
+
+.vscode/
+```
