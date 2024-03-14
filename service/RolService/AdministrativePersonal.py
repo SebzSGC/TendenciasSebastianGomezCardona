@@ -11,7 +11,7 @@ def validatePatientId(hospital, id):
         if patient.id == id:
             return patient
     return None
-    
+
 def validateDoctor(hospital, name):
     if hospital.employees == []:
         return None
@@ -61,13 +61,12 @@ def validDoctorId(hospital, id):
     return None
 
 def createPatient(hospital, id, fullName, bornDate, genre, address, phoneNumber, email):
-    patient = validatePatientId(hospital, id)
     typeValidator.validEmail(email)
     typeValidator.validPhoneNumber(phoneNumber)
     typeValidator.validDateAndAge(bornDate)
     if len(address) > 30:
         raise Exception("Dirección muy larga")
-    if patient:
+    if validatePatientId(hospital, id):
         raise Exception("ya existe un paciente con esa cedula registrada")
     patient = User.Patient(id, fullName, bornDate, genre, address, phoneNumber, email)
     hospital.clinicalHistories[str(id)] = {} 

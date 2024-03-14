@@ -6,17 +6,26 @@ def validateEmployeeId(hospital, id):
     for employee in hospital.employees:
         if employee.idNumber == id:
             return employee
-    return None    
+    return None
+
+def validateEmployeeUsernName(hospital, userName):
+    if hospital.employees == []:
+        return None
+    for employee in hospital.employees:
+        if employee.userName == userName:
+            return employee
+    return None       
 
 def createEmployee(hospital, fullName, idNumber, email, phoneNumber, bornDate, adress, rol, userName, password):
-    employee = validateEmployeeId(hospital, idNumber)
     typeValidator.validEmail(email)
     typeValidator.validPhoneNumber(phoneNumber)
     typeValidator.validDateAndAge(bornDate)
     if len(adress) > 30:
         raise Exception("Dirección muy larga")
-    if employee:
+    if validateEmployeeId(hospital, idNumber):
         raise Exception("ya existe un empleado con esa cedula registrada")
+    if validateEmployeeUsernName(hospital, userName) and userName.isalnum() and len(userName) <= 15:
+        raise Exception("ya existe un empleado con ese nombre de usuario o no cumple los requisitos")
     employee = Employee(fullName, idNumber, email, phoneNumber, bornDate, adress, rol, userName, password)
     hospital.employees.append(employee)
     print(f"Empleado: {employee.fullName} creado con éxito")
