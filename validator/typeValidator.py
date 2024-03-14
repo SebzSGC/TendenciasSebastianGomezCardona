@@ -46,3 +46,9 @@ def validEmail(email):
         return
     else:
         raise ValueError("Formato de correo inválido")
+    
+def validPhoneNumber(phone):
+    if len(phone) < 11 and len(phone) > 0 and phone.isdigit():
+        return
+    else:
+        raise ValueError("Formato de número de teléfono inválido")

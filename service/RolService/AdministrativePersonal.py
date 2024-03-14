@@ -63,6 +63,7 @@ def validDoctorId(hospital, id):
 def createPatient(hospital, id, fullName, bornDate, genre, address, phoneNumber, email):
     patient = validatePatientId(hospital, id)
     typeValidator.validEmail(email)
+    typeValidator.validPhoneNumber(phoneNumber)
     if patient:
         raise Exception("ya existe un paciente con esa cedula registrada")
     patient = User.Patient(id, fullName, bornDate, genre, address, phoneNumber, email)
