@@ -95,9 +95,15 @@ def getMedicalInsuranceData(hospital, patient):
         print(f"Por favor ingrese los datos de la poliza de {patient.fullName}")
         idUser = patient.id
         nameOfInsuranceCompany = input("Nombre de la compañia de seguros: ")
-        policyNumber = input("Número de poliza: ")
-        policyState = input("Estado de la poliza: ")
-        policyValidity = input("Vigencia de la poliza: ")
+        policyNumber = input("Número de poliza:\n")
+        policyState = input("Estado de la poliza (activo/inactivo):\n")
+        if policyState not in ["activo", "inactivo"]:
+            raise Exception("Estado de la poliza inválido")
+        if policyState == "inactivo":
+            policyState = False
+        if policyState == "activo":
+            policyState = True
+        policyValidity = input("Fecha de finalizacion de la poliza:\n")
         administrativePersonal.createMedicalInsurance(hospital, idUser, nameOfInsuranceCompany, policyNumber, policyState, policyValidity)
     except Exception as error:
         print(str(error))
