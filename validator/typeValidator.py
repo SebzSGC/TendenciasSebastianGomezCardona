@@ -55,20 +55,23 @@ def validDateAndAge(date):
         raise Exception("Formato de fecha inválido")
 
 def validEmail(email):
-    if "@" in email and "." in email:
-        return
-    else:
+    try:
+        if "@" in email and "." in email:
+            return       
+    except ValueError:
         raise ValueError("Formato de correo inválido")
     
 def validPhoneNumber(phone):
-    if len(phone) < 11 and len(phone) > 0 and phone.isdigit():
-        return
-    else:
+    try:
+        if len(phone) < 11 and len(phone) > 0 and phone.isdigit():
+            return
+    except ValueError:
         raise ValueError("Formato de número de teléfono inválido")
     
 def validPassword(password):
-    pattern = r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
-    if bool(re.match(pattern, password)):
-        return
-    else:
+    try:
+        pattern = r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+        if bool(re.match(pattern, password)):
+            return
+    except ValueError:    
         raise ValueError("Formato de contraseña inválido") 
