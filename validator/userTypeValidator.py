@@ -2,6 +2,7 @@ import datetime
 import service.RolService.AdministrativePersonal as administrativePersonal
 import service.RolService.Doctor as doctor
 import service.RolService.Nurse as nurse
+from validator import typeValidator
 
 def getPatientData(hospital):
     try:
@@ -9,7 +10,11 @@ def getPatientData(hospital):
         id = input("Numero de documento: ")
         fullName = input("Nombre completo: ")
         bornDate = input("Fecha de nacimiento (DD/MM/AAAA): ")
-        genre = input("Género: ")
+        genre = "Opción inválida"
+        while genre == "Opción inválida":
+            print("Por favor seleccione el genero:")
+            genre = input("1. Masculino\n2. Femenino\n3. Otro\n")
+            genre = typeValidator.validGenre(genre)
         address = input("Dirección: ")
         phoneNumber = input("Número de teléfono: ")
         email = input("Correo electrónico: ")
