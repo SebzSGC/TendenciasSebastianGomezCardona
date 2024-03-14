@@ -45,7 +45,7 @@ def validDate(date):
 def validDateAndAge(date):
     try:
         dateObjt = datetime.datetime.strptime(date, '%d/%m/%Y')
-        actualDate = datetime.now()
+        actualDate = datetime.datetime.now()
         difference = actualDate.year - dateObjt.year
         if 0 <= difference <= 150:
             return True
