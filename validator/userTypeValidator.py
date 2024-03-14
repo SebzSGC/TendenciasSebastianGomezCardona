@@ -103,6 +103,8 @@ def getMedicalInsuranceData(hospital, patient):
             policyState = False
         if policyState == "activo":
             policyState = True
+        if policyState != "activo" and policyState != "inactivo":
+            policyState = False
         policyValidity = input("Fecha de finalizacion de la poliza:\n")
         administrativePersonal.createMedicalInsurance(hospital, idUser, nameOfInsuranceCompany, policyNumber, policyState, policyValidity)
     except Exception as error:
