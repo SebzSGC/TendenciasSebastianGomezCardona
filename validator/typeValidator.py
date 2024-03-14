@@ -40,3 +40,9 @@ def validDate(date):
         return correctDate
     except ValueError:
         raise ValueError("Formato de fecha inválido, por favor ingrese la fecha en el formato dd/mm/yyyy")
+    
+def validEmail(email):
+    if "@" in email and "." in email:
+        return
+    else:
+        raise ValueError("Formato de correo inválido")

@@ -1,5 +1,5 @@
 from model.Employee import Employee
-
+from validator import typeValidator
 def validateEmployeeId(hospital, id):
     if hospital.employees == []:
         return None
@@ -10,6 +10,7 @@ def validateEmployeeId(hospital, id):
 
 def createEmployee(hospital, fullName, idNumber, email, phoneNumber, bornDate, adress, rol, userName, password):
     employee = validateEmployeeId(hospital, idNumber)
+    typeValidator.validEmail(email)
     if employee:
         raise Exception("ya existe un empleado con esa cedula registrada")
     employee = Employee(fullName, idNumber, email, phoneNumber, bornDate, adress, rol, userName, password)

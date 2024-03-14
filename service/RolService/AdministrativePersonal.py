@@ -1,5 +1,5 @@
-import validator.typeValidator as validator
 import model.User as User
+from validator import typeValidator
 from model.Invoice import Invoice
 from model.MedicalAppointment import MedicalAppointment
 
@@ -62,6 +62,7 @@ def validDoctorId(hospital, id):
 
 def createPatient(hospital, id, fullName, bornDate, genre, address, phoneNumber, email):
     patient = validatePatientId(hospital, id)
+    typeValidator.validEmail(email)
     if patient:
         raise Exception("ya existe un paciente con esa cedula registrada")
     patient = User.Patient(id, fullName, bornDate, genre, address, phoneNumber, email)
@@ -114,7 +115,7 @@ def generateAppointment(hospital, patient, doctor, date):
         raise Exception("El paciente no existe")
     if doctor == None:
         raise Exception("El doctor no existe")
-    date = validator.validDate(date)
+    date = typeValidator.validDate(date)
     appointment = MedicalAppointment(patient.id, doctor.idNumber, date)
     hospital.appointments.append(appointment)
     print(f"Cita programada para el paciente: {patient.fullName}, el dia {date} con el doctor: {doctor.fullName}")
@@ -126,12 +127,12 @@ def generateInvoice(hospital, patient, appointment):
     doctor = validDoctorId(hospital, idDoctor)
     print(f"Factura generada para el paciente: {patient.fullName}, con la cita: {appointment["Date"]}")
     print("Nombre del paciente: ",invoice.patient.fullName)
-    print("Edad del paciente: ", validator.getCorrectAge(invoice.patient.bornDate))
+    print("Edad del paciente: ", typeValidator.getCorrectAge(invoice.patient.bornDate))
     print("Cedula del paciente", invoice.patient.id)
     print("Nombre del doctor: ", doctor.fullName)
     print("Nombre de la compañia de seguro del paciente: ", invoice.patient.medicalInsurance.nameOfInsuranceCompany)
     print("Numero de poliza del paciente: ", invoice.patient.medicalInsurance.policyNumber)
-    print("Dias de vigencia de la poliza: ", validator.getValidityPolicy(invoice.patient.medicalInsurance.policyValidity))
+    print("Dias de vigencia de la poliza: ", typeValidator.getValidityPolicy(invoice.patient.medicalInsurance.policyValidity))
     print("Fecha de la finalizacion de la poliza: ", invoice.patient.medicalInsurance.policyValidity)
     if invoice.medicalAppointment["order"]["orderMedications"]:
         print("Medicamentos: ")
