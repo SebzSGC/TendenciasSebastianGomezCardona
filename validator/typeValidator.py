@@ -1,4 +1,5 @@
 import datetime
+import re
 
 def validRole(newRole):
     rolOptions = {
@@ -64,3 +65,10 @@ def validPhoneNumber(phone):
         return
     else:
         raise ValueError("Formato de número de teléfono inválido")
+    
+def validPassword(password):
+    pattern = r'^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$'
+    if bool(re.match(pattern, password)):
+        return
+    else:
+        raise ValueError("Formato de contraseña inválido") 

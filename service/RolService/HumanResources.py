@@ -20,6 +20,7 @@ def createEmployee(hospital, fullName, idNumber, email, phoneNumber, bornDate, a
     typeValidator.validEmail(email)
     typeValidator.validPhoneNumber(phoneNumber)
     typeValidator.validDateAndAge(bornDate)
+    typeValidator.validPassword(password)
     if len(adress) > 30:
         raise Exception("Dirección muy larga")
     if validateEmployeeId(hospital, idNumber):
