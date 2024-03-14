@@ -6,7 +6,7 @@ def validateEmployeeId(hospital, id):
     for employee in hospital.employees:
         if employee.idNumber == id:
             return employee
-        return None
+    return None    
 
 def createEmployee(hospital, fullName, idNumber, email, phoneNumber, bornDate, adress, rol, userName, password):
     employee = validateEmployeeId(hospital, idNumber)
