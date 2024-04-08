@@ -1,9 +1,32 @@
-# Archivos compilados de Python
+# Entorno virtual (si estás usando uno)
+venv/
+env/
+
+# Archivos generados por el sistema operativo
 *.pyc
-
-# Directorios de caché de Python
 __pycache__/
+*.swp
 
+# Carpeta de archivos estáticos generados
+staticfiles/
 
-.vscode/
-```
+# Carpeta de migraciones de la base de datos
+*/migrations/
+
+# Archivo de configuración local
+*.env
+
+# Carpeta de archivos de registro
+log/
+logs/
+
+# Archivo de base de datos local (SQLite)
+db.sqlite3
+
+# Archivos de configuración de PyCharm
+.idea/
+*.iml
+
+# Archivos de caché
+.cach*
+.cache/
