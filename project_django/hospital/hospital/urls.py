@@ -16,10 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from hospitalApp.views import PatientView
+import hospitalApp.views as views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('hospital/patients', PatientView.as_view(), name='patient post get'),
-    path('hospital/patients/<int:idDocument>', PatientView.as_view(), name="patient get put and delete"),
+    path('hospital/patients', views.PatientView.as_view(), name='patient post get'),
+    path('hospital/patients/<int:idDocument>', views.PatientView.as_view(), name="patient get put"),
+    path('hospital/patients/<int:idPatient>/emergencycontact', views.EmergencyContactView.as_view(),
+         name="emergency contact get post put"),
 ]

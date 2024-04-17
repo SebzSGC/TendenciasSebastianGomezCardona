@@ -16,6 +16,10 @@ def getPatients() -> list | None:
     return list(models.Patient.objects.values())
 
 
+def getEmergencyContact(idPatient: int):
+    return model_to_dict(models.EmergencyContact.objects.get(idPatient=idPatient))
+
+
 # def validateDoctor(hospital, name):
 #     if hospital.employees == []:
 #         return None
@@ -84,10 +88,16 @@ def createPatient(idDocument: int, fullName: str, bornDate: str, genre: str, add
     # hospital.clinicalHistories[str(id)] = {}
 
 
-def createEmergencyContact(name: str, relationship: str, phoneNumber: str, patientId: int) -> None:
+def createEmergencyContact(fullName: str, relationship: str, phoneNumber: str, patientId: int) -> None:
     typeValidator.validPhoneNumber(phoneNumber)
-    emergencyContact = models.EmergencyContact(patientId, name, relationship, phoneNumber)
-    emergencyContact.save()
+    if validatePatientId(patientId):
+        patient = getPatient(patientId)
+        emergencyContact = models.EmergencyContact(idPatient=patient,
+                                                   fullName=fullName, relationship=relationship,
+                                                   phoneNumber=phoneNumber)
+        emergencyContact.save()
+    else:
+        raise Exception("No se permite asignar un contacto de emergencia a un paciente que no existe")
 
 
 # def createMedicalInsurance(hospital, idUser, nameOfInsuranceCompany, policyNumber, policyState, policyValidity):
@@ -112,16 +122,14 @@ def updatePatient(idDocument: int, fullName: str, bornDate: str, genre: str, add
     else:
         raise Exception("El paciente no existe")
 
-#
-#
-# def updateEmergencyContact(hospital, contact, attribute, newInfo, oldAttribute):
-#     contact = validatePatientId(hospital, contact.idUser)
-#     if not contact:
-#         raise Exception("El contacto de emergencia no esta asociado a un paciente")
-#     setattr(contact, attribute, newInfo)
-#     print(f"Informacion de contacto del paciente: {oldAttribute} cambiado por {newInfo}, actualizacion con éxito")
-#
-#
+
+def updateEmergencyContact(idPatient, fullName, relationship, phoneNumber):
+    if validatePatientId(idPatient):
+        models.EmergencyContact.objects.filter(idPatient=idPatient).update(fullName=fullName, relationship=relationship,
+                                                                           phoneNumber=phoneNumber)
+    else:
+        raise Exception("El contacto de emergencia no existe")
+
 # def updateMedicalInsurance(hospital, insurance, attribute, newInfo, oldAttribute):
 #     insurance = validatePatientId(hospital, insurance.idUser)
 #     if not insurance:
