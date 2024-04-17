@@ -1,0 +1,213 @@
+from django.forms import model_to_dict
+
+from ... import models
+from ...validator import typeValidator, userTypeValidator, employeeTypeValidator
+
+
+def validatePatientId(idDocument: int) -> bool:
+    return models.Patient.objects.filter(idDocument=idDocument).exists()
+
+
+def getPatient(idDocument: int):
+    return model_to_dict(models.Patient.objects.get(pk=idDocument))
+
+
+def getPatients() -> list | None:
+    return list(models.Patient.objects.values())
+
+
+# def validateDoctor(hospital, name):
+#     if hospital.employees == []:
+#         return None
+#     for doctor in hospital.employees:
+#         if doctor.fullName == name and doctor.rol == "Doctor":
+#             return doctor
+#     return None
+#
+#
+# def getMedicine(hospital, medicine):
+#     if medicine is None or medicine == "N/A":
+#         return None
+#     for medication in hospital.stockMedicine:
+#         if medication.name == medicine:
+#             return medication
+#     return None
+
+
+# def getProcedure(hospital, procedure):
+#     if procedure is None or procedure == "N/A":
+#         return None
+#     for procedures in hospital.procedures:
+#         if procedures.name == procedure:
+#             return procedures
+#     return None
+#
+#
+# def getMedicineById(hospital, medicineById):
+#     if medicineById is None or medicineById == "N/A":
+#         return None
+#     for medication in hospital.stockMedicine:
+#         if medication.id == medicineById:
+#             return medication
+#     return None
+#
+#
+# def getProcedureById(hospital, procedureById):
+#     if procedureById is None or procedureById == "N/A":
+#         return None
+#     for procedures in hospital.procedures:
+#         if procedures.id == procedureById:
+#             return procedures
+#     return None
+#
+#
+# def validDoctorId(hospital, id):
+#     if hospital.employees == []:
+#         return None
+#     for doctor in hospital.employees:
+#         if doctor.idNumber == id and doctor.rol == "Doctor":
+#             return doctor
+#     return None
+
+
+def createPatient(idDocument: int, fullName: str, bornDate: str, genre: str, address: str, phoneNumber: str,
+                  email: str) -> None:
+    typeValidator.validEmail(email)
+    typeValidator.validPhoneNumber(phoneNumber)
+    typeValidator.validDateAndAge(bornDate)
+    if len(address) > 30:
+        raise Exception("Dirección muy larga")
+    if validatePatientId(idDocument):
+        raise Exception("El paciente ya existe")
+    patient = models.Patient(idDocument, fullName, bornDate, genre, address, phoneNumber, email)
+    patient.save()
+    # hospital.clinicalHistories[str(id)] = {}
+
+
+def createEmergencyContact(name: str, relationship: str, phoneNumber: str, patientId: int) -> None:
+    typeValidator.validPhoneNumber(phoneNumber)
+    emergencyContact = models.EmergencyContact(patientId, name, relationship, phoneNumber)
+    emergencyContact.save()
+
+
+# def createMedicalInsurance(hospital, idUser, nameOfInsuranceCompany, policyNumber, policyState, policyValidity):
+#     patient = validatePatientId(hospital, idUser)
+#     if not patient:
+#         raise Exception("El paciente no existe")
+#     insurance = models.MedicalInsurance(idUser, nameOfInsuranceCompany, policyNumber, policyState, policyValidity)
+#     patient.medicalInsurance = insurance
+#
+#
+def updatePatient(idDocument: int, fullName: str, bornDate: str, genre: str, address: str, phoneNumber: str,
+                  email: str) -> None:
+    typeValidator.validEmail(email)
+    typeValidator.validPhoneNumber(phoneNumber)
+    typeValidator.validDateAndAge(bornDate)
+    if len(address) > 30:
+        raise Exception("Dirección muy larga")
+    if validatePatientId(idDocument):
+        models.Patient.objects.filter(idDocument=idDocument).update(fullName=fullName, bornDate=bornDate, genre=genre,
+                                                                    address=address, phoneNumber=phoneNumber,
+                                                                    email=email)
+    else:
+        raise Exception("El paciente no existe")
+
+#
+#
+# def updateEmergencyContact(hospital, contact, attribute, newInfo, oldAttribute):
+#     contact = validatePatientId(hospital, contact.idUser)
+#     if not contact:
+#         raise Exception("El contacto de emergencia no esta asociado a un paciente")
+#     setattr(contact, attribute, newInfo)
+#     print(f"Informacion de contacto del paciente: {oldAttribute} cambiado por {newInfo}, actualizacion con éxito")
+#
+#
+# def updateMedicalInsurance(hospital, insurance, attribute, newInfo, oldAttribute):
+#     insurance = validatePatientId(hospital, insurance.idUser)
+#     if not insurance:
+#         raise Exception("La poliza no esta asociada a un paciente")
+#     setattr(insurance, attribute, newInfo)
+#     print(f"Informacion de la poliza del paciente: {oldAttribute} cambiado por {newInfo}, actualizacion con éxito")
+#
+#
+# def generateAppointment(hospital, patient, doctor, date):
+#     if patient == None:
+#         raise Exception("El paciente no existe")
+#     if doctor == None:
+#         raise Exception("El doctor no existe")
+#     date = typeValidator.validDate(date)
+#     appointment = MedicalAppointment(patient.id, doctor.idNumber, date)
+#     hospital.appointments.append(appointment)
+#     print(f"Cita programada para el paciente: {patient.fullName}, el dia {date} con el doctor: {doctor.fullName}")
+#
+#
+# def generateInvoice(hospital, patient, appointment):
+#     totalToPay = 0
+#     idDoctor = appointment["DoctorDocument"]
+#     invoice = Invoice(appointment, patient)
+#     doctor = validDoctorId(hospital, idDoctor)
+#     printInvoiceDetails(invoice, doctor)
+#     totalToPay = calculateTotalToPay(hospital, invoice, totalToPay)
+#     printTotalToPay(invoice, totalToPay)
+#
+#
+# def printInvoiceDetails(invoice, doctor):
+#     print(
+#         f"Factura generada para el paciente: {invoice.patient.fullName}, con la cita: {invoice.medicalAppointment['Date']}")
+#     print("Nombre del paciente: ", invoice.patient.fullName)
+#     print("Edad del paciente: ", typeValidator.getCorrectAge(invoice.patient.bornDate))
+#     print("Cedula del paciente", invoice.patient.id)
+#     print("Nombre del doctor: ", doctor.fullName)
+#     print("Nombre de la compañia de seguro del paciente: ", invoice.patient.medicalInsurance.nameOfInsuranceCompany)
+#     print("Numero de poliza del paciente: ", invoice.patient.medicalInsurance.policyNumber)
+#     print("Dias de vigencia de la poliza: ",
+#           typeValidator.getValidityPolicy(invoice.patient.medicalInsurance.policyValidity))
+#     print("Fecha de la finalizacion de la poliza: ", invoice.patient.medicalInsurance.policyValidity)
+#
+#
+# def calculateTotalToPay(hospital, invoice, totalToPay):
+#     if invoice.medicalAppointment["order"]["orderMedications"]:
+#         print("Medicamentos: ")
+#         totalToPay = calculateTotalForMedications(hospital, invoice, totalToPay)
+#     else:
+#         print("No se recetaron medicamentos")
+#
+#     if invoice.medicalAppointment["order"]["orderProcedures"]:
+#         print("Procedimientos: ")
+#         calculateTotalForProcedures(hospital, invoice)
+#     else:
+#         print("No se programaron procedimientos")
+#     return totalToPay
+#
+#
+# def calculateTotalForMedications(hospital, invoice, totalToPay):
+#     for medication in invoice.medicalAppointment["order"]["orderMedications"]:
+#         if medication == "idMedication":
+#             infoMedicine = getMedicineById(hospital, invoice.medicalAppointment["order"]["orderMedications"]["item"])
+#             print(" item: ", invoice.medicalAppointment["order"]["orderMedications"]["item"])
+#             print("     Medicamento: ", infoMedicine.name)
+#             print("     Cantidad: ", infoMedicine.dosage)
+#             print("     Precio: ", infoMedicine.price)
+#             totalToPay += infoMedicine.price
+#     return totalToPay
+#
+#
+# def calculateTotalForProcedures(hospital, invoice):
+#     for procedure in invoice.medicalAppointment["order"]["orderProcedures"]:
+#         if procedure == "idProcedure":
+#             infoProcedure = getProcedureById(hospital, invoice.medicalAppointment["order"]["orderProcedures"]["item"])
+#             print(" item: ", invoice.medicalAppointment["order"]["orderProcedures"]["item"])
+#             print("     Procedimiento: ", infoProcedure.name)
+#             print("     Descripcion: ", infoProcedure.description)
+#
+#
+# def printTotalToPay(invoice, totalToPay):
+#     if invoice.patient.medicalInsurance.policyState == True:
+#         print("El paciente cuenta con seguro medico")
+#         print("Copago de: $", 50000)
+#         print("Precio por medicamentos: ", totalToPay)
+#         print("Total a pagar: ", 50000)
+#     else:
+#         print("El paciente no cuenta con seguro medico")
+#         print("Precio por medicamentos: ", totalToPay)
+#         print("Total a pagar: ", totalToPay)
