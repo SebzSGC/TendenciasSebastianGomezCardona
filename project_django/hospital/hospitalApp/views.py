@@ -97,7 +97,6 @@ class EmergencyContactView(View):
         response = {"message": message}
         return JsonResponse(response, status=status)
 
-
     def put(self, request, idPatient):
         try:
             body = json.loads(request.body)
@@ -107,7 +106,7 @@ class EmergencyContactView(View):
             AdministrativePersonal.updateEmergencyContact(
                 idPatient, fullName, relationship, phoneNumber
             )
-            message = f'Paciente {fullName} actualizado satisfactoriamente'
+            message = f'contacto {fullName} actualizado satisfactoriamente'
             status = 200
         except Exception as error:
             message = str(error)
@@ -122,7 +121,65 @@ class EmergencyContactView(View):
             else:
                 raise ObjectDoesNotExist
         except ObjectDoesNotExist:
-            message = "Paciente no encontrado"
+            message = "Contacto no encontrado"
+            status = 404
+            response = {"message": message}
+        except Exception as error:
+            message = str(error)
+            status = 400
+            response = {"message": message}
+        return JsonResponse(response, status=status, safe=False)
+
+
+class MedicalInsuranceView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args: any, **kwargs: any):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, idPatient):
+        try:
+            body = json.loads(request.body)
+            nameOfInsuranceCompany = body.get("nameOfInsuranceCompany")
+            policyNumber = body.get("policyNumber")
+            policyState = body.get("policyState")
+            policyValidity = body.get("policyValidity")
+            AdministrativePersonal.createMedicalInsurance(
+                idPatient, nameOfInsuranceCompany, policyNumber, policyState, policyValidity
+            )
+            message = f'Seguro medico {nameOfInsuranceCompany} creado satisfactoriamente'
+            status = 200
+        except Exception as error:
+            message = str(error)
+            status = 400
+        response = {"message": message}
+        return JsonResponse(response, status=status)
+
+    def put(self, request, idPatient):
+        try:
+            body = json.loads(request.body)
+            nameOfInsuranceCompany = body.get("nameOfInsuranceCompany")
+            policyNumber = body.get("policyNumber")
+            policyState = body.get("policyState")
+            policyValidity = body.get("policyValidity")
+            AdministrativePersonal.updateMedicalInsurance(
+                idPatient, nameOfInsuranceCompany, policyNumber, policyState, policyValidity
+            )
+            message = f'Seguro medico {nameOfInsuranceCompany} actualizado satisfactoriamente'
+            status = 200
+        except Exception as error:
+            message = str(error)
+            status = 400
+        return JsonResponse({"message": message}, status=status, safe=False)
+
+    def get(self, request, idPatient):
+        try:
+            if AdministrativePersonal.validatePatientId(idPatient):
+                response = AdministrativePersonal.getMedicalInsurance(idPatient)
+                status = 200
+            else:
+                raise ObjectDoesNotExist
+        except ObjectDoesNotExist:
+            message = "seguro medico no encontrado"
             status = 404
             response = {"message": message}
         except Exception as error:
