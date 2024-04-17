@@ -30,6 +30,10 @@ class Procedure(models.Model):
 
 class Patient(models.Model):
     idDocument: int = models.BigIntegerField(primary_key=True)
+    idEmergencyContact: int = models.ForeignKey(EmergencyContact, on_delete=models.CASCADE, to_field='id',
+                                                db_column='idEmergencyContact')
+    idMedicalInsurance: int = models.ForeignKey(MedicalInsurance, on_delete=models.CASCADE, to_field='id',
+                                                db_column='idMedicalInsurance')
     fullName: str = models.CharField(max_length=255)
     bornDate: str = models.CharField(max_length=80)
     genre: str = models.CharField(max_length=50)
@@ -38,10 +42,15 @@ class Patient(models.Model):
     email: str = models.EmailField()
 
 
-class EmergencyContact(models.Model):
-    id: int = models.BigIntegerField(primary_key=True)
+class OrderPatient(models.Model):
     idPatient: int = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument',
                                        db_column='idPatient')
+    idOrder: int = models.ForeignKey(Order, on_delete=models.CASCADE, to_field='id', db_column='idOrder')
+    date: str = models.CharField(max_length=80)
+
+
+class EmergencyContact(models.Model):
+    id: int = models.AutoField(primary_key=True)
     fullName: str = models.CharField(max_length=255)
     relationship: str = models.CharField(max_length=20)
     phoneNumber: str = models.CharField(max_length=20)
@@ -49,8 +58,6 @@ class EmergencyContact(models.Model):
 
 class MedicalInsurance(models.Model):
     id: int = models.AutoField(primary_key=True)
-    idPatient: int = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument',
-                                       db_column='idPatient')
     nameOfInsuranceCompany: str = models.CharField(max_length=255)
     policyNumber: int = models.BigIntegerField()
     policyState: bool = models.BooleanField()
@@ -59,8 +66,6 @@ class MedicalInsurance(models.Model):
 
 class Order(models.Model):
     id: int = models.AutoField(primary_key=True)
-    idPatient: int = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument',
-                                       db_column='idPatient')
     idDoctor: int = models.ForeignKey(Employee, on_delete=models.CASCADE, to_field='id', db_column='idDoctor')
 
 
