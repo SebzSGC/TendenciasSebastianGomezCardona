@@ -30,3 +30,6 @@ db.sqlite3
 # Archivos de caché
 .cach*
 .cache/
+
+
+project_django/Patient.http
