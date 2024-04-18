@@ -4,7 +4,7 @@ from django.db import models
 # Create your models here.
 
 class Employee(models.Model):
-    id: int = models.BigIntegerField(primary_key=True)
+    id: int = models.AutoField(primary_key=True)
     fullName: str = models.CharField(max_length=255)
     email: str = models.EmailField()
     phoneNumber: str = models.CharField(max_length=20)
