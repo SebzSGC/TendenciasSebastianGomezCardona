@@ -44,3 +44,11 @@ def getMedicineById(id: int) -> dict | None:
 
 def getProcedureById(id: int) -> dict | None:
     return models.Procedure.objects.get(id=id)
+
+
+def validateEmployeeById(id: int) -> bool:
+    return models.Employee.objects.filter(id=id).exists()
+
+
+def validateEmployeeByUserName(userName):
+    return models.Employee.objects.filter(userName=userName).exists()
