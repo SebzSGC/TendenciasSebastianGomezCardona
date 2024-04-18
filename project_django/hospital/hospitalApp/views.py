@@ -5,7 +5,7 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from .service.RolService import AdministrativePersonal
+from .service import validatorService
 
 
 # Create your views here.
@@ -41,9 +41,9 @@ class PatientView(View):
     def get(self, request, idDocument=None):
         try:
             if idDocument is not None:
-                response = AdministrativePersonal.getPatient(idDocument)
+                response = validatorService.getPatientById(idDocument)
             else:
-                response = AdministrativePersonal.getPatients()
+                response = validatorService.getPatients()
             status = 200
         except ObjectDoesNotExist:
             message = "Paciente no encontrado"
@@ -115,8 +115,8 @@ class EmergencyContactView(View):
 
     def get(self, request, idPatient=None):
         try:
-            if AdministrativePersonal.validatePatientId(idPatient):
-                response = AdministrativePersonal.getEmergencyContact(idPatient)
+            if validatorService.validatePatientById(idPatient):
+                response = validatorService.getEmergencyContactById(idPatient)
                 status = 200
             else:
                 raise ObjectDoesNotExist
@@ -173,8 +173,8 @@ class MedicalInsuranceView(View):
 
     def get(self, request, idPatient):
         try:
-            if AdministrativePersonal.validatePatientId(idPatient):
-                response = AdministrativePersonal.getMedicalInsurance(idPatient)
+            if validatorService.validatePatientById(idPatient):
+                response = validatorService.getMedicalInsuranceById(idPatient)
                 status = 200
             else:
                 raise ObjectDoesNotExist

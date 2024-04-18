@@ -1,82 +1,8 @@
 from django.forms import model_to_dict
-
 from ... import models
 from ...validator import typeValidator, userTypeValidator, employeeTypeValidator
 from hospital.connection_mongo import collection
-
-
-def validatePatientId(idDocument: int) -> bool:
-    return models.Patient.objects.filter(idDocument=idDocument).exists()
-
-
-def getPatient(idDocument: int):
-    return model_to_dict(models.Patient.objects.get(pk=idDocument))
-
-
-def getPatients() -> list | None:
-    return list(models.Patient.objects.values())
-
-
-def getEmergencyContact(idPatient: int):
-    return model_to_dict(models.EmergencyContact.objects.get(idPatient=idPatient))
-
-
-def getMedicalInsurance(idPatient: int):
-    return model_to_dict(models.MedicalInsurance.objects.get(idPatient=idPatient))
-
-
-# def validateDoctor(hospital, name):
-#     if hospital.employees == []:
-#         return None
-#     for doctor in hospital.employees:
-#         if doctor.fullName == name and doctor.rol == "Doctor":
-#             return doctor
-#     return None
-#
-#
-# def getMedicine(hospital, medicine):
-#     if medicine is None or medicine == "N/A":
-#         return None
-#     for medication in hospital.stockMedicine:
-#         if medication.name == medicine:
-#             return medication
-#     return None
-
-
-# def getProcedure(hospital, procedure):
-#     if procedure is None or procedure == "N/A":
-#         return None
-#     for procedures in hospital.procedures:
-#         if procedures.name == procedure:
-#             return procedures
-#     return None
-#
-#
-# def getMedicineById(hospital, medicineById):
-#     if medicineById is None or medicineById == "N/A":
-#         return None
-#     for medication in hospital.stockMedicine:
-#         if medication.id == medicineById:
-#             return medication
-#     return None
-#
-#
-# def getProcedureById(hospital, procedureById):
-#     if procedureById is None or procedureById == "N/A":
-#         return None
-#     for procedures in hospital.procedures:
-#         if procedures.id == procedureById:
-#             return procedures
-#     return None
-#
-#
-# def validDoctorId(hospital, id):
-#     if hospital.employees == []:
-#         return None
-#     for doctor in hospital.employees:
-#         if doctor.idNumber == id and doctor.rol == "Doctor":
-#             return doctor
-#     return None
+from .. import validatorService
 
 
 def createPatient(idDocument: int, fullName: str, bornDate: str, genre: str, address: str, phoneNumber: str,
@@ -97,7 +23,7 @@ def createPatient(idDocument: int, fullName: str, bornDate: str, genre: str, add
 def createEmergencyContact(fullName: str, relationship: str, phoneNumber: str, patientId: int) -> None:
     typeValidator.validPhoneNumber(phoneNumber)
     if validatePatientId(patientId):
-        patient = getPatient(patientId)
+        patient = validatorService.getPatientById(patientId)
         emergencyContact = models.EmergencyContact(idPatient=patient,
                                                    fullName=fullName, relationship=relationship,
                                                    phoneNumber=phoneNumber)
@@ -108,8 +34,8 @@ def createEmergencyContact(fullName: str, relationship: str, phoneNumber: str, p
 
 def createMedicalInsurance(idPatient: int, nameOfInsuranceCompany: str, policyNumber: int, policyState: bool,
                            policyValidity: str) -> None:
-    if validatePatientId(idPatient):
-        patient = models.Patient(**getPatient(idPatient))
+    if validatorService.validatePatientById(idPatient):
+        patient = models.Patient(**validatorService.getPatientById(idPatient))
         insurance = models.MedicalInsurance(idPatient=patient, nameOfInsuranceCompany=nameOfInsuranceCompany,
                                             policyNumber=policyNumber, policyState=policyState,
                                             policyValidity=policyValidity)
@@ -125,7 +51,7 @@ def updatePatient(idDocument: int, fullName: str, bornDate: str, genre: str, add
     typeValidator.validDateAndAge(bornDate)
     if len(address) > 30:
         raise Exception("Dirección muy larga")
-    if validatePatientId(idDocument):
+    if validatorService.validatePatientById(idDocument):
         models.Patient.objects.filter(idDocument=idDocument).update(fullName=fullName, bornDate=bornDate, genre=genre,
                                                                     address=address, phoneNumber=phoneNumber,
                                                                     email=email)
@@ -134,7 +60,7 @@ def updatePatient(idDocument: int, fullName: str, bornDate: str, genre: str, add
 
 
 def updateEmergencyContact(idPatient: int, fullName: str, relationship: str, phoneNumber: str) -> None:
-    if validatePatientId(idPatient):
+    if validatorService.validatePatientById(idPatient):
         models.EmergencyContact.objects.filter(idPatient=idPatient).update(fullName=fullName, relationship=relationship,
                                                                            phoneNumber=phoneNumber)
     else:
@@ -143,7 +69,7 @@ def updateEmergencyContact(idPatient: int, fullName: str, relationship: str, pho
 
 def updateMedicalInsurance(idPatient: int, nameOfInsuranceCompany: str, policyNumber: int, policyState: bool,
                            policyValidity: str) -> None:
-    if validatePatientId(idPatient):
+    if validatorService.validatePatientById(idPatient):
         models.MedicalInsurance.objects.filter(idPatient=idPatient).update(
             nameOfInsuranceCompany=nameOfInsuranceCompany, policyNumber=policyNumber, policyState=policyState,
             policyValidity=policyValidity)
