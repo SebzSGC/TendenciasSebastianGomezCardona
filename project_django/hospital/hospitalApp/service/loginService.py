@@ -1,5 +1,5 @@
 from .. import models
 
 
-def searchEmployee(userName: srt) -> bool:
-    return models.Patient.objects.filter(userName=userName).exists()
+def validCredentials(userName: srt, password: str) -> bool:
+    return models.Employee.objects.filter(userName=userName, password=password).exists()
