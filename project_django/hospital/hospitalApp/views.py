@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from hospitalApp.service import validatorService
-from hospitalApp.service.RolService import AdministrativePersonal
+from hospitalApp.service.RolService import AdministrativePersonal, HumanResources
 
 
 # Create your views here.
@@ -69,6 +69,75 @@ class PatientView(View):
                 idDocument, fullName, bornDate, genre, address, phoneNumber, email
             )
             message = f'Paciente {fullName} actualizado satisfactoriamente'
+            status = 200
+        except Exception as error:
+            message = str(error)
+            status = 400
+        return JsonResponse({"message": message}, status=status, safe=False)
+
+
+class EmployeeView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args: any, **kwargs: any):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request):
+        try:
+            body = json.loads(request.body)
+            fullName = body.get("fullName")
+            email = body.get("email")
+            phoneNumber = body.get("phoneNumber")
+            bornDate = body.get("bornDate")
+            address = body.get("address")
+            rol = body.get("rol")
+            userName = body.get("userName")
+            password = body.get("password")
+            HumanResources.createEmployee(
+                fullName, email, phoneNumber, bornDate, address, rol, userName, password
+            )
+            message = f'Empleado {fullName} creado satisfactoriamente'
+            status = 200
+        except ObjectDoesNotExist:
+            message = "Empleado no encontrado"
+            status = 404
+        except Exception as error:
+            message = str(error)
+            status = 400
+        response = {"message": message}
+        return JsonResponse(response, status=status)
+
+    def get(self, request, id=None):
+        try:
+            if id is not None:
+                response = validatorService.getEmployeeById(id)
+            else:
+                response = validatorService.getEmployees()
+            status = 200
+        except ObjectDoesNotExist:
+            message = "Empleado no encontrado"
+            status = 404
+            response = {"message": message}
+        except Exception as error:
+            message = str(error)
+            status = 400
+            response = {"message": message}
+        return JsonResponse(response, status=status, safe=False)
+
+    def put(self, request, id):
+        try:
+            body = json.loads(request.body)
+            fullName = body.get("fullName")
+            email = body.get("email")
+            phoneNumber = body.get("phoneNumber")
+            bornDate = body.get("bornDate")
+            address = body.get("address")
+            rol = body.get("rol")
+            userName = body.get("userName")
+            password = body.get("password")
+            HumanResources.updateEmployee(
+                id, fullName, email, phoneNumber, bornDate, address, rol, userName, password
+            )
+            message = f'Empleado {fullName} actualizado satisfactoriamente'
             status = 200
         except Exception as error:
             message = str(error)
