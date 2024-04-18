@@ -14,6 +14,10 @@ def getPatients() -> list | None:
     return list(models.Patient.objects.values())
 
 
+def getEmployees() -> list | None:
+    return list(models.Employee.objects.values())
+
+
 def getEmergencyContactById(idPatient: int) -> dict | None:
     return model_to_dict(models.EmergencyContact.objects.get(idPatient=idPatient))
 

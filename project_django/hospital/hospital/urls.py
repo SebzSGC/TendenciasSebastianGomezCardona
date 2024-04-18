@@ -26,4 +26,7 @@ urlpatterns = [
          name="emergency contact get post put"),
     path('hospital/patients/<int:idPatient>/medicalinsurance', views.MedicalInsuranceView.as_view(),
          name="medical insurance get post put"),
+    path('hospital/employees', views.PatientView.as_view(), name='employee post get'),
+    path('hospital/employees/<int:idEmployee>', views.MedicalInsuranceView.as_view(),
+         name="employee get put"),
 ]
