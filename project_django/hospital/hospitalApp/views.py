@@ -5,7 +5,8 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from .service import validatorService
+from hospitalApp.service import validatorService
+from hospitalApp.service.RolService import AdministrativePersonal
 
 
 # Create your views here.

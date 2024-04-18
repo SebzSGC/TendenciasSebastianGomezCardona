@@ -2,7 +2,7 @@ from django.forms import model_to_dict
 from ... import models
 from ...validator import typeValidator, userTypeValidator, employeeTypeValidator
 from hospital.connection_mongo import collection
-from .. import validatorService
+from hospitalApp.service import validatorService
 
 
 def createPatient(idDocument: int, fullName: str, bornDate: str, genre: str, address: str, phoneNumber: str,
@@ -12,7 +12,7 @@ def createPatient(idDocument: int, fullName: str, bornDate: str, genre: str, add
     typeValidator.validDateAndAge(bornDate)
     if len(address) > 30:
         raise Exception("Dirección muy larga")
-    if validatePatientId(idDocument):
+    if validatorService.validatePatientById(idDocument):
         raise Exception("El paciente ya existe")
     patient = models.Patient(idDocument, fullName, bornDate, genre, address, phoneNumber, email)
     patient.save()
@@ -22,8 +22,8 @@ def createPatient(idDocument: int, fullName: str, bornDate: str, genre: str, add
 
 def createEmergencyContact(fullName: str, relationship: str, phoneNumber: str, patientId: int) -> None:
     typeValidator.validPhoneNumber(phoneNumber)
-    if validatePatientId(patientId):
-        patient = validatorService.getPatientById(patientId)
+    if validatorService.validatePatientById(patientId):
+        patient = models.Patient(**validatorService.getPatientById(patientId))
         emergencyContact = models.EmergencyContact(idPatient=patient,
                                                    fullName=fullName, relationship=relationship,
                                                    phoneNumber=phoneNumber)

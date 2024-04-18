@@ -1,3 +1,7 @@
+from hospitalApp import models
+from django.forms.models import model_to_dict
+
+
 def validatePatientById(idDocument: int) -> bool:
     return models.Patient.objects.filter(idDocument=idDocument).exists()
 
