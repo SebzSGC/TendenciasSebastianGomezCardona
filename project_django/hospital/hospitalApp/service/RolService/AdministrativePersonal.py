@@ -2,6 +2,7 @@ from django.forms import model_to_dict
 
 from ... import models
 from ...validator import typeValidator, userTypeValidator, employeeTypeValidator
+from hospital.connection_mongo import collection
 
 
 def validatePatientId(idDocument: int) -> bool:
@@ -89,7 +90,8 @@ def createPatient(idDocument: int, fullName: str, bornDate: str, genre: str, add
         raise Exception("El paciente ya existe")
     patient = models.Patient(idDocument, fullName, bornDate, genre, address, phoneNumber, email)
     patient.save()
-    # hospital.clinicalHistories[str(id)] = {}
+    clinicalHistory = {"_id": str(patient.idDocument), "historias": {}}
+    collection.insert_one(clinicalHistory)
 
 
 def createEmergencyContact(fullName: str, relationship: str, phoneNumber: str, patientId: int) -> None:
