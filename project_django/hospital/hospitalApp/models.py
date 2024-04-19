@@ -40,8 +40,8 @@ class Patient(models.Model):
 
 class EmergencyContact(models.Model):
     id: int = models.AutoField(primary_key=True)
-    idPatient: int = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument',
-                                       db_column='idPatient')
+    idPatient: int = models.OneToOneField(Patient, on_delete=models.CASCADE, to_field='idDocument',
+                                          db_column='idPatient')
     fullName: str = models.CharField(max_length=255)
     relationship: str = models.CharField(max_length=20)
     phoneNumber: str = models.CharField(max_length=20)
@@ -49,7 +49,7 @@ class EmergencyContact(models.Model):
 
 class MedicalInsurance(models.Model):
     id: int = models.AutoField(primary_key=True)
-    idPatient: int = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument',
+    idPatient: int = models.OneToOneField(Patient, on_delete=models.CASCADE, to_field='idDocument',
                                        db_column='idPatient')
     nameOfInsuranceCompany: str = models.CharField(max_length=255)
     policyNumber: int = models.BigIntegerField()
