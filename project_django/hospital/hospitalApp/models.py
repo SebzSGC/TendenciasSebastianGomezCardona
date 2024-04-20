@@ -41,7 +41,7 @@ class Patient(models.Model):
 class EmergencyContact(models.Model):
     id: int = models.AutoField(primary_key=True)
     idPatient: int = models.OneToOneField(Patient, on_delete=models.CASCADE, to_field='idDocument',
-                                          db_column='idPatient')
+                                          db_column='idPatient', related_name='emergencyContact')
     fullName: str = models.CharField(max_length=255)
     relationship: str = models.CharField(max_length=20)
     phoneNumber: str = models.CharField(max_length=20)
@@ -50,7 +50,7 @@ class EmergencyContact(models.Model):
 class MedicalInsurance(models.Model):
     id: int = models.AutoField(primary_key=True)
     idPatient: int = models.OneToOneField(Patient, on_delete=models.CASCADE, to_field='idDocument',
-                                       db_column='idPatient')
+                                          db_column='idPatient', related_name='medicalInsurance')
     nameOfInsuranceCompany: str = models.CharField(max_length=255)
     policyNumber: int = models.BigIntegerField()
     policyState: bool = models.BooleanField()
@@ -136,23 +136,26 @@ class OrderHelpDiagnostic(models.Model):
     amount: float = models.FloatField()
     item: int = models.IntegerField()
 
-# Create your mongomodels here.
+
+class ClinicalVisit(models.Model):
+    id = models.AutoField(primary_key=True)
+    idPatient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    date = models.CharField(max_length=30)
+    vitalData = models.ForeignKey(VitalData, on_delete=models.CASCADE)
 
 
-# class ClinicalVisit(mongomodels.Model):
-#     id = models.BigIntegerField(primary_key=True)
-#     idPatient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-#     date = models.CharField(max_length=30)
-#     medication = []
-#     procedure = []
-#     vitalData = models.ForeignKey(VitalData, on_delete=models.CASCADE)
+class OrderMedicationVisit(models.Model):
+    idClinicalVisit = models.ForeignKey(ClinicalVisit, on_delete=models.CASCADE)
+    idOrder = models.ForeignKey(OrderMedication, on_delete=models.CASCADE)
 
-# class Hospital(mongomodels.Model):
-#     patients=[]
-#     employees=[]
-#     appointments=[]
-#     clinicalHistories={}
-#     stockMedicine=[]
-#     procedures=[]
-#     orders=[]
-#     patientVisits=[]
+
+class OrderProcedureVisit(models.Model):
+    idClinicalVisit = models.ForeignKey(ClinicalVisit, on_delete=models.CASCADE)
+    idOrder = models.ForeignKey(OrderProcedure, on_delete=models.CASCADE)
+
+
+class Session(models.Model):
+    id = models.AutoField(primary_key=True)
+    idEmployee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    token = models.CharField(max_length=255)
+    date = models.CharField(max_length=30)
