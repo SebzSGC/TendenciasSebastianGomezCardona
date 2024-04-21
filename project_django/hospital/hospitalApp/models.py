@@ -60,16 +60,19 @@ class MedicalInsurance(models.Model):
 class Order(models.Model):
     id: int = models.AutoField(primary_key=True)
     idPatient: int = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument',
-                                       db_column='idPatient')
-    idDoctor: int = models.ForeignKey(Employee, on_delete=models.CASCADE, to_field='id', db_column='idDoctor')
+                                       db_column='idPatient', related_name='order_patient')
+    idDoctor: int = models.ForeignKey(Employee, on_delete=models.CASCADE, to_field='id', db_column='idDoctor',
+                                      related_name='order_employee')
 
 
 class ClinicalHistory(models.Model):
     id: int = models.BigIntegerField(primary_key=True)
-    idPatient: Patient = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument',
-                                           db_column='idPatient')
-    idDoctor: Employee = models.ForeignKey(Employee, on_delete=models.CASCADE, to_field='id', db_column='idDoctor')
-    idOrder: Order = models.ForeignKey(Order, on_delete=models.CASCADE, to_field='id', db_column='idOrder')
+    idPatient: int = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument',
+                                       db_column='idPatient', related_name='history_patient')
+    idDoctor: int = models.ForeignKey(Employee, on_delete=models.CASCADE, to_field='id', db_column='idDoctor',
+                                      related_name='history_employee')
+    idOrder: Order = models.ForeignKey(Order, on_delete=models.CASCADE, to_field='id', db_column='idOrder',
+                                       related_name='order')
     consultReason: str = models.CharField(max_length=255)
     symptomatology: str = models.CharField(max_length=255)
     diagnosis: str = models.CharField(max_length=255)
@@ -79,7 +82,7 @@ class ClinicalHistory(models.Model):
 class VitalData(models.Model):
     id: int = models.AutoField(primary_key=True)
     idPatient: int = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument',
-                                       db_column='idPatient')
+                                       db_column='idPatient', related_name='vitalData_patient')
     arterialPressure: float = models.FloatField()
     temperature: float = models.FloatField()
     pulse: int = models.IntegerField()
@@ -89,22 +92,25 @@ class VitalData(models.Model):
 class MedicalAppointment(models.Model):
     id: int = models.AutoField(primary_key=True)
     idPatient: int = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument',
-                                       db_column='idPatient')
-    idDoctor: int = models.ForeignKey(Employee, on_delete=models.CASCADE, to_field='id', db_column='idDoctor')
+                                       db_column='idPatient', related_name='appointment_patient')
+    idDoctor: int = models.ForeignKey(Employee, on_delete=models.CASCADE, to_field='id', db_column='idDoctor',
+                                      related_name='appointment_employee')
     date: str = models.CharField(max_length=80)
 
 
 class Invoice(models.Model):
     id: int = models.AutoField(primary_key=True)
     idMedicalAppointment: int = models.ForeignKey(MedicalAppointment, on_delete=models.CASCADE,
-                                                  to_field='id', db_column='idMedicalAppointment')
+                                                  to_field='id', db_column='idMedicalAppointment',
+                                                  related_name='invoice_Appointment')
 
 
 class OrderMedication(models.Model):
     id: int = models.AutoField(primary_key=True)
-    idOrder: int = models.ForeignKey(Order, on_delete=models.CASCADE, to_field='id', db_column='idOrder')
+    idOrder: int = models.ForeignKey(Order, on_delete=models.CASCADE, to_field='id', db_column='idOrder',
+                                     related_name='OrderMedication_Order')
     idMedication: int = models.ForeignKey(Medication, on_delete=models.CASCADE, to_field='id',
-                                          db_column='idMedication')
+                                          db_column='idMedication', related_name='OrderMedication_Medication')
     dose: float = models.FloatField()
     treatmentDuration: str = models.CharField(max_length=100)
     amount: float = models.FloatField()
@@ -113,9 +119,10 @@ class OrderMedication(models.Model):
 
 class OrderProcedure(models.Model):
     id: int = models.AutoField(primary_key=True)
-    idOrder: int = models.ForeignKey(Order, on_delete=models.CASCADE, to_field='id', db_column='idOrder')
+    idOrder: int = models.ForeignKey(Order, on_delete=models.CASCADE, to_field='id', db_column='idOrder',
+                                     related_name='OrderProcedure_Order')
     idProcedure: int = models.ForeignKey(Procedure, on_delete=models.CASCADE, to_field='id',
-                                         db_column='idProcedure')
+                                         db_column='idProcedure', related_name='OrderProcedure_Procedure')
     amount: float = models.FloatField()
     frequency: str = models.CharField(max_length=100)
     item: int = models.IntegerField()
@@ -124,13 +131,15 @@ class OrderProcedure(models.Model):
 class OrderProcedureAssistance(models.Model):
     id: int = models.AutoField(primary_key=True)
     idOrderProcedure: int = models.ForeignKey(OrderProcedure, on_delete=models.CASCADE, to_field='id',
-                                              db_column='idOrderProcedure')
+                                              db_column='idOrderProcedure',
+                                              related_name='OrderProcedureAssistance_OrderProcedure')
     idSpecialist: str = models.CharField(max_length=255)
 
 
 class OrderHelpDiagnostic(models.Model):
     id: int = models.AutoField(primary_key=True)
-    idOrder: int = models.ForeignKey(Order, on_delete=models.CASCADE, to_field='id', db_column='idOrder')
+    idOrder: int = models.ForeignKey(Order, on_delete=models.CASCADE, to_field='id', db_column='idOrder',
+                                     related_name='OrderHelpDiagnostic_Order')
     nameHelpDiagnostic: str = models.CharField(max_length=255)
     quantity: float = models.FloatField()
     amount: float = models.FloatField()
@@ -139,23 +148,28 @@ class OrderHelpDiagnostic(models.Model):
 
 class ClinicalVisit(models.Model):
     id = models.AutoField(primary_key=True)
-    idPatient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    idPatient = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument', db_column='idPatient',
+                                  related_name='clinicalVisit_patient')
     date = models.CharField(max_length=30)
     vitalData = models.ForeignKey(VitalData, on_delete=models.CASCADE)
 
 
 class OrderMedicationVisit(models.Model):
-    idClinicalVisit = models.ForeignKey(ClinicalVisit, on_delete=models.CASCADE)
-    idOrder = models.ForeignKey(OrderMedication, on_delete=models.CASCADE)
+    idClinicalVisit = models.ForeignKey(ClinicalVisit, on_delete=models.CASCADE, to_field='id',
+                                        db_column='idClinicalVisit', related_name='orderMedicationVisit_clinicalVisit')
+    idOrder = models.ForeignKey(OrderMedication, on_delete=models.CASCADE, to_field='id', db_column='idOrder',
+                                related_name='orderMedicationVisit_order')
 
 
 class OrderProcedureVisit(models.Model):
-    idClinicalVisit = models.ForeignKey(ClinicalVisit, on_delete=models.CASCADE)
-    idOrder = models.ForeignKey(OrderProcedure, on_delete=models.CASCADE)
+    idClinicalVisit = models.ForeignKey(ClinicalVisit, on_delete=models.CASCADE, to_field='id',
+                                        db_column='idClinicalVisit', related_name='orderProcedureVisit_clinicalVisit')
+    idOrder = models.ForeignKey(OrderProcedure, on_delete=models.CASCADE, to_field='id', db_column='idOrder',
+                                related_name='orderProcedureVisit_order')
 
 
 class Session(models.Model):
     id = models.AutoField(primary_key=True)
-    idEmployee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    idEmployee = models.ForeignKey(Employee, on_delete=models.CASCADE, to_field='id', db_column='idEmployee')
     token = models.CharField(max_length=255)
     date = models.CharField(max_length=30)
