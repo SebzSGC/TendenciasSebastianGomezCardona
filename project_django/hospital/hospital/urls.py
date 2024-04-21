@@ -29,4 +29,10 @@ urlpatterns = [
     path('hospital/employees', views.PatientView.as_view(), name='employee post get'),
     path('hospital/employees/<int:idEmployee>', views.MedicalInsuranceView.as_view(),
          name="employee get put"),
+    path('hospital/employees/doctor/<int:idDocument>', views.DoctorView.as_view(),
+         name="doctor data patient get"),
+    ##@param: patientdata or clinicalhistory or appointmentsMade or appointments or generatehistory
+    path('hospital/employees/doctor/<str:param>/<int:idDocument>', views.DoctorView.as_view(),
+         name="doctor data patient get"),
+    path('hospital/login', views.LoginView.as_view(), name="login"),
 ]

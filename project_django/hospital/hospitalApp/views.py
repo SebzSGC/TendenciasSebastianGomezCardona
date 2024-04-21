@@ -5,8 +5,8 @@ from django.http import JsonResponse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from hospitalApp.service import validatorService
-from hospitalApp.service.RolService import AdministrativePersonal, HumanResources
+from hospitalApp.service import validatorService, loginService
+from hospitalApp.service.RolService import AdministrativePersonal, HumanResources, Doctor
 
 
 # Create your views here.
@@ -144,6 +144,16 @@ class EmployeeView(View):
             status = 400
         return JsonResponse({"message": message}, status=status, safe=False)
 
+    def delete(self, request, id):
+        try:
+            HumanResources.deleteEmployee(id)
+            message = "Empleado eliminado satisfactoriamente"
+            status = 200
+        except Exception as error:
+            message = str(error)
+            status = 400
+        return JsonResponse({"message": message}, status=status, safe=False)
+
 
 class EmergencyContactView(View):
     @method_decorator(csrf_exempt)
@@ -257,3 +267,68 @@ class MedicalInsuranceView(View):
             status = 400
             response = {"message": message}
         return JsonResponse(response, status=status, safe=False)
+
+
+class DoctorView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args: any, **kwargs: any):
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, param, idDocument=None):
+        try:
+            if idDocument is not None:
+                response = Doctor.getBasicPatientInfo(idDocument)
+            elif param == "clinicalhistory" and idDocument is not None:
+                response = Doctor.getPatientClinicalHistory(idDocument)
+            elif param == "patientdata" and idDocument is not None:
+                response = Doctor.getBasicPatientInfo(idDocument)
+            elif param == "appointmentsMade" and idDocument is not None:
+                response = Doctor.getAppointmentsMade(idDocument)
+            elif param == "appointments" and idDocument is not None:
+                response = Doctor.getAppointments(idDocument)
+            else:
+                response = {"message": "Parametro no valido"}
+        except Exception as error:
+            return JsonResponse({"message": str(error)}, status=400)
+        return JsonResponse(response, status=200, safe=False)
+
+
+class LoginView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args: any, **kwargs: any):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request):
+        try:
+            body = json.loads(request.body)
+            session = loginService.login(body.get("userName"), body.get("password"))
+            response = {"message": "Inicio de sesión exitoso", "token": session.token}
+            status = 200
+        except Exception as error:
+            response = {"message": str(error)}
+            status = 400
+        return JsonResponse(response, status=status)
+
+    def get(self, request):
+        try:
+            token = request.META.get("HTTP_TOKEN")
+            session = loginService.getSession(token)
+            rol = session.idEmployee.rol
+            status = 200
+            response = {"message": "Sesión activa", "rol": rol}
+        except Exception as error:
+            response = {"message": str(error)}
+            status = 400
+        return JsonResponse(response, status=status)
+
+    def delete(self, request):
+        try:
+            token = request.META.get("HTTP_TOKEN")
+            session = loginService.getSession(token)
+            session.delete()
+            response = {"message": "Sesión cerrada"}
+            status = 200
+        except Exception as error:
+            response = {"message": str(error)}
+            status = 400
+        return JsonResponse(response, status=status)

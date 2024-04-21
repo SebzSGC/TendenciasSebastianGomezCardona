@@ -1,108 +1,40 @@
-# import hospitalApp.validator.typeValidator as typeValidator
-# from hospitalApp.service.RolService.AdministrativePersonal import validatePatientId, validDoctorId, getMedicine, getProcedure
-# import model.Order as Order
-#
-# def printDictItem(item, indent):
-#     indentation = "  " * indent
-#     for key, value in item.items():
-#         if isinstance(value, dict):
-#             print(f"{indentation}{key}:")
-#             printDictItem(value, indent + 1)
-#         elif isinstance(value, list):
-#             print(f"{indentation}{key}:")
-#             printListItems(value, indent + 1)
-#         else:
-#             print(f"{indentation}{key}: {value}")
-#
-# def printListItems(items, indent):
-#     indentation = "  " * indent
-#     for idx, item in enumerate(items):
-#         print(f"{indentation}Item {idx + 1}:")
-#         printDictItem(item, indent + 1)
-#
-# def printClinicalHistory(history):
-#     printDictItem(history, 0)
-#
-# def getAppointmentByDate(hospital):
-#     date = input("Ingrese la fecha de la cita (dd/mm/yyyy):\n")
-#     if date not in hospital.appointments:
-#         raise Exception("No hay citas programadas para esta fecha")
-#     for appointment in hospital.appointments:
-#         if hospital.appointments.date == date:
-#             return appointment
-#     raise Exception("No hay citas programadas para esta fecha")
-#
-# def getPersonalPatientInfo(hospital, patientDocument):
-#     patient = validatePatientId(hospital, patientDocument)
-#     if not patient:
-#         raise Exception("El paciente no existe")
-#     print(f"Nombre: {patient.fullName}")
-#     print(f"Documento: {patient.id}")
-#     print(f"Fecha de nacimiento: {patient.bornDate}")
-#     print(f"Genero: {patient.genre}")
-#     print(f"Dirección: {patient.address}")
-#     print(f"Telefono: {patient.phoneNumber}")
-#     print(f"Correo: {patient.email}")
-#     if patient.emergencyContact:
-#         print(f"Contacto de emergencia: {patient.emergencyContact.name}")
-#         print(f"Relación: {patient.emergencyContact.relationship}")
-#         print(f"Telefono: {patient.emergencyContact.phoneNumber}")
-#     if patient.medicalInsurance:
-#         print(f"Seguro médico: {patient.medicalInsurance.nameOfInsuranceCompany}")
-#         print(f"Numero de poliza: {patient.medicalInsurance.policyNumber}")
-#         print(f"Estado de la poliza: {patient.medicalInsurance.policyState}")
-#         print(f"Vigencia de la poliza: {patient.medicalInsurance.policyValidity}")
-#
-# def getPersonalClinicalHistory(hospital, patientDocument):
-#     patient = validatePatientId(hospital, patientDocument)
-#     if not patient:
-#         raise Exception("El paciente no existe")
-#     if not hospital.clinicalHistories[patientDocument]:
-#         print("El paciente no tiene historias clinicas registradas")
-#         return
-#     print("Fechas disponibles:")
-#     for date in hospital.clinicalHistories[patientDocument].keys():
-#         print(date)
-#     chosenDate = input("Por favor, ingrese una fecha para visualizar:\n")
-#     if chosenDate not in hospital.clinicalHistories[patientDocument]:
-#         print("La fecha seleccionada no está disponible. Por favor, elija una fecha válida.")
-#     else:
-#         history = hospital.clinicalHistories[patientDocument][chosenDate]
-#         printClinicalHistory(history)
-#
-# def getPersonalVisits(hospital, patientDocument):
-#     patient = validatePatientId(hospital, patientDocument)
-#     if patient is None:
-#         raise Exception("El paciente no existe")
-#     if hospital.patientVisits == []:
-#         raise Exception("El paciente no tiene visitas registradas")
-#     print("Fechas disponibles:")
-#     for visit in hospital.patientVisits:
-#         print(visit.date)
-#     chosenDate = input("Por favor, ingrese una fecha con la hora para visualizar:\n")
-#     for visit in hospital.patientVisits:
-#         if chosenDate == visit.date:
-#             return visit
-#     else:
-#         print("La fecha seleccionada no está disponible. Por favor, elija una fecha con la hora válida.")
-#
-# def getAppointmentsByPatient(hospital, patientDocument):
-#     patient = validatePatientId(hospital, patientDocument)
-#     if patient is None:
-#         raise Exception("El paciente no existe")
-#     if hospital.appointments == []:
-#         raise Exception("El paciente no tiene citas para poder generar la factura")
-#     print("Fechas de citas disponibles para asociar la factura:")
-#     for dateAppointment in hospital.appointments:
-#         if dateAppointment.idPatient == patientDocument:
-#             print(dateAppointment.date)
-#     chosenDate = input("Por favor, ingrese una fecha:\n")
-#     for appointment in hospital.clinicalHistories[patientDocument]:
-#         if chosenDate == appointment:
-#             return hospital.clinicalHistories[patientDocument][chosenDate]
-#     else:
-#         raise Exception("La fecha seleccionada no coincide con la cita correcta. Por favor, elija una fecha válida o valide los datos.")
-#
+from hospitalApp import models
+from django.forms.models import model_to_dict
+from django.db import connection
+from hospitalApp.service import validatorService
+from hospital.connection_mongo import collection
+import json
+
+
+def getBasicPatientInfo(idDocument: int):
+    patient = models.Patient.objects.prefetch_related('emergencyContact', 'medicalInsurance').get(idDocument=idDocument)
+    response = {"Patient": model_to_dict(patient), "EmergencyContact": model_to_dict(patient.emergencyContact),
+                "MedicalInsurance": model_to_dict(patient.medicalInsurance)}
+    return response
+
+
+def getPatientClinicalHistory(idDocument: int) -> dict:
+    if validatorService.validatePatientById(idDocument):
+        clinicalHistories = collection.find_one({"_id": str(idDocument)})
+        return clinicalHistories
+
+
+def getAppointmentsMade(idDocument: int) -> list:
+    if validatorService.validatePatientById(idDocument) and models.ClinicalVisit.objects.filter(
+            idPatient=idDocument).exists():
+        visits = models.ClinicalVisit.objects.values().filter(idPatient=idDocument)
+        return list(visits)
+    else:
+        raise Exception("No se encontraron visitas para el paciente")
+
+
+def getAppointments(patientDocument: int) -> list:
+    if validatorService.validatePatientById(patientDocument):
+        appointments = models.MedicalAppointment.objects.values().filter(idPatient=patientDocument)
+        return list(appointments)
+    else:
+        raise Exception("No se encontraron citas para el paciente")
+
 # def generateHistory(hospital, patientDocument, doctorDocument, procedure, medicine, helpDiagnostic, date, consultReason, symptomatology, diagnosis):
 #     patient = validatePatientId(hospital, patientDocument)
 #     doc = validDoctorId(hospital, doctorDocument)
