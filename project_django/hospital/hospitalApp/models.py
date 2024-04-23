@@ -57,26 +57,22 @@ class MedicalInsurance(models.Model):
     policyValidity: str = models.CharField(max_length=80)
 
 
-class Order(models.Model):
-    id: int = models.AutoField(primary_key=True)
-    idPatient: int = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument',
-                                       db_column='idPatient', related_name='order_patient')
-    idDoctor: int = models.ForeignKey(Employee, on_delete=models.CASCADE, to_field='id', db_column='idDoctor',
-                                      related_name='order_employee')
-
-
 class ClinicalHistory(models.Model):
-    id: int = models.BigIntegerField(primary_key=True)
-    idPatient: int = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument',
-                                       db_column='idPatient', related_name='history_patient')
-    idDoctor: int = models.ForeignKey(Employee, on_delete=models.CASCADE, to_field='id', db_column='idDoctor',
-                                      related_name='history_employee')
-    idOrder: Order = models.ForeignKey(Order, on_delete=models.CASCADE, to_field='id', db_column='idOrder',
-                                       related_name='order')
-    consultReason: str = models.CharField(max_length=255)
-    symptomatology: str = models.CharField(max_length=255)
-    diagnosis: str = models.CharField(max_length=255)
-    date: str = models.CharField(max_length=80)
+    id = models.AutoField(primary_key=True)
+    idPatient = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument',
+                                  db_column='idPatient', related_name='history_patient')
+    idDoctor = models.ForeignKey(Employee, on_delete=models.CASCADE, to_field='id', db_column='idDoctor',
+                                 related_name='history_employee')
+    consultReason = models.CharField(max_length=255)
+    symptomatology = models.CharField(max_length=255)
+    diagnosis = models.CharField(max_length=255)
+    date = models.CharField(max_length=80)
+
+
+class Order(models.Model):
+    id = models.AutoField(primary_key=True)
+    idClinicalHistory = models.ForeignKey(ClinicalHistory, on_delete=models.CASCADE, to_field='id',
+                                          db_column='idClinicalHistory')
 
 
 class VitalData(models.Model):
