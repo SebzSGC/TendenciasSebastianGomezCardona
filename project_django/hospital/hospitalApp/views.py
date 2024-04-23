@@ -292,6 +292,68 @@ class DoctorView(View):
             return JsonResponse({"message": str(error)}, status=400)
         return JsonResponse(response, status=200, safe=False)
 
+    def post(self, request, param, idDocument):
+        try:
+            if param == "generatehistory":
+                body = json.loads(request.body)
+                doctorDocument = body.get("doctorDocument")
+                date = body.get("date")
+                consultReason = body.get("consultReason")
+                symptomatology = body.get("symptomatology")
+                diagnosis = body.get("diagnosis")
+                Doctor.generateHistory(
+                    idDocument, doctorDocument, date, consultReason, symptomatology, diagnosis
+                )
+                message = "Historia clínica generada satisfactoriamente"
+                status = 200
+            elif param == "generateorder":
+                body = json.loads(request.body)
+                idDoctor = body.get("idDoctor")
+                idClinicalHistory = body.get("idClinicalHistory")
+                Doctor.generateOrder(
+                    idDocument, idDoctor, idClinicalHistory
+                )
+                message = "Orden generada satisfactoriamente"
+                status = 200
+            elif param == "generateorderhelpdiagnostic":
+                body = json.loads(request.body)
+                idOrder = body.get("idOrder")
+                helpDiagnostic = body.get("helpDiagnostic")
+                quantity = body.get("quantity")
+                amount = body.get("amount")
+                Doctor.generateOrderHelpDiagnostic(
+                    idDocument, idOrder, helpDiagnostic, quantity, amount
+                )
+                message = "ayuda diagnostica para la orden generada satisfactoriamente"
+                status = 200
+            elif param == "generateordermedication":
+                body = json.loads(request.body)
+                idOrder = body.get("idOrder")
+                item = body.get("item")
+                idMedication = body.get("idMedication")
+                dose = body.get("dose")
+                treatmentDuration = body.get("treatmentDuration")
+                amount = body.get("amount")
+                Doctor.generateOrderMedication(
+                    idDocument, idOrder, item, idMedication, dose, treatmentDuration, amount
+                )
+                message = "Medicamento para la orden generada satisfactoriamente"
+                status = 200
+            elif param == "generateorderprocedure":
+                body = json.loads(request.body)
+                idOrder = body.get("idOrder")
+                item = body.get("item")
+                idProcedure = body.get("idProcedure")
+                amount = body.get("amount")
+                frequency = body.get("frequency")
+                Doctor.generateOrderProcedure(idDocument, idOrder, item, idProcedure, amount, frequency)
+                message = "Procedimiento para la orden generada satisfactoriamente"
+                status = 200
+        except Exception as error:
+            message = str(error)
+            status = 400
+        return JsonResponse({"message": message}, status=status, safe=False)
+
 
 class LoginView(View):
     @method_decorator(csrf_exempt)

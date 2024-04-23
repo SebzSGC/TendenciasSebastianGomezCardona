@@ -38,13 +38,12 @@ def getValidityPolicy(datePolicyValidity: str) -> int:
     return validity.days
 
 
-def validDate(date: str) -> str:
+def validDate(date: str) -> bool:
     try:
         dateObj = datetime.strptime(date, '%d/%m/%Y')
-        correctDate = dateObj.strftime('%d/%m/%Y')
-        return correctDate
+        return True
     except ValueError:
-        raise ValueError("Formato de fecha inválido, por favor ingrese la fecha en el formato dd/mm/yyyy")
+        return False
 
 
 def validDateAndAge(date: str) -> bool:

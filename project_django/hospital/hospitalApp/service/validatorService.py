@@ -60,3 +60,7 @@ def validateEmployeeById(id: int) -> bool:
 
 def validateEmployeeByUserName(userName):
     return models.Employee.objects.filter(userName=userName).exists()
+
+
+def getDoctor(idDocument: int):
+    return model_to_dict(models.Employee.objects.get(idDocument=idDocument, rol="Doctor"))

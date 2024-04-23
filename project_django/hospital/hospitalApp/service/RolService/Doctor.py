@@ -1,6 +1,7 @@
 from hospitalApp import models
 from django.forms.models import model_to_dict
 from django.db import connection
+from hospitalApp.validator import typeValidator
 from hospitalApp.service import validatorService
 from hospital.connection_mongo import collection
 import json
@@ -35,134 +36,148 @@ def getAppointments(patientDocument: int) -> list:
     else:
         raise Exception("No se encontraron citas para el paciente")
 
-# def generateHistory(hospital, patientDocument, doctorDocument, procedure, medicine, helpDiagnostic, date, consultReason, symptomatology, diagnosis):
-#     patient = validatePatientId(hospital, patientDocument)
-#     doc = validDoctorId(hospital, doctorDocument)
+
+def generateHistory(patientDocument: int, doctorDocument: int, date: str, consultReason: str, symptomatology: str,
+                    diagnosis: str):
+    if models.ClinicalHistory.objects.filter(idPatient=patientDocument, date=date).exists():
+        raise Exception("Ya existe una historia clinica para el paciente en la fecha especificada")
+    if validatorService.validatePatientById(patientDocument) and validatorService.validateDoctorById(
+            doctorDocument) and typeValidator.validDate(date):
+        patient = models.Patient(**validatorService.getPatientById(patientDocument))
+        doctor = models.Employee(**validatorService.getEmployeeById(doctorDocument))
+        newClinicalHistory = models.ClinicalHistory(idPatient=patient, idDoctor=doctor,
+                                                    consultReason=consultReason,
+                                                    symptomatology=symptomatology, diagnosis=diagnosis, date=date)
+        newClinicalHistory.save()
+        clinicalHistoryData = {
+            key: value for key, value in vars(newClinicalHistory).items() if key != '_state'
+        }
+        patientData = {
+            key: value for key, value in vars(patient).items() if key != '_state'
+        }
+        doctorData = {
+            key: value for key, value in vars(doctor).items() if key != '_state'
+        }
+        clinicalHistoryData["Patient"] = patientData
+        clinicalHistoryData["Doctor"] = doctorData
+        del clinicalHistoryData["idPatient_id"]
+        del clinicalHistoryData["idDoctor_id"]
+
+        collection.update_one(
+            {"_id": str(patientDocument)},
+            {"$set": {f"histories.{newClinicalHistory.date}": clinicalHistoryData}}
+        )
+
+
+    else:
+        raise Exception("No se pudo generar la historia clinica, valida los datos")
+
+
+def generateOrder(idPatient: int, idDoctor: int, idClinicalHistory: int):
+    if validatorService.validatePatientById(idPatient) and validatorService.validateDoctorById(idDoctor):
+        clinicalHistory = models.ClinicalHistory.objects.get(id=idClinicalHistory)
+        actualOrder = models.Order(idClinicalHistory=clinicalHistory)
+        actualOrder.save()
+        orderData = {
+            key: value for key, value in vars(actualOrder).items() if key != '_state' or key != 'idClinicalHistory_id'
+        }
+
+        collection.update_one(
+            {"_id": str(idPatient)},
+            {"$set": {f"histories.{clinicalHistory.date}.order": orderData}}
+        )
+
+    else:
+        raise Exception("No se pudo generar la orden, valida los datos")
+
+
+def generateOrderHelpDiagnostic(idPatient: int, idOrder: int, item: int, helpDiagnostic: str, quantity: int,
+                                amount: float):
+    if models.OrderMedication.objects.filter(idOrder=idOrder).exists():
+        raise Exception("No se puede agregar una ayuda diagnostica a una orden que ya tiene medicamentos")
+    if models.OrderProcedure.objects.filter(idOrder=idOrder).exists():
+        raise Exception("No se puede agregar una ayuda diagnostica a una orden que ya tiene procedimientos")
+    if models.Order.objects.filter(id=idOrder).exists():
+        try:
+            clinicalHistory = models.ClinicalHistory.objects.get(idPatient=idPatient)
+            order = models.Order.objects.get(id=idOrder)
+        except Exception as e:
+            raise Exception(str(e))
+        OrderHelpDiagnostic = models.OrderHelpDiagnostic()
+        OrderHelpDiagnostic.idOrder = order
+        OrderHelpDiagnostic.item = item
+        OrderHelpDiagnostic.nameHelpDiagnostic = helpDiagnostic
+        OrderHelpDiagnostic.quantity = quantity
+        OrderHelpDiagnostic.amount = amount
+        OrderHelpDiagnostic.save()
+
+        helpDiagnosticData = {
+            key: value for key, value in vars(OrderHelpDiagnostic).items() if
+            key != '_state' or key != 'idClinicalHistory_id' or key != 'idOrder_id'
+        }
+
+        collection.update_one(
+            {"_id": str(idPatient)},
+            {"$set": {f"histories.{clinicalHistory.date}.order.helpDiagnostic": helpDiagnosticData}}
+        )
+
+
 #
-#     if not (patient and doc):
-#         raise Exception("El documento del paciente o del doctor no es valido o no existe")
-#
-#     try:
-#         typeValidator.validDate(date)
-#     except ValueError as e:
-#         raise Exception(str(e))
-#
-#     medicine = getMedicine(hospital, medicine) if medicine != "N/A" else "N/A"
-#     procedure = getProcedure(hospital, procedure) if procedure != "N/A" else "N/A"
-#
-#     newClinicalHistory = {
-#         "Date": date,
-#         "DoctorDocument": doctorDocument,
-#         "consultReason": consultReason,
-#         "symptomatology": symptomatology,
-#         "diagnosis": diagnosis,
-#         "order": None
-#     }
-#
-#     if procedure is None and medicine is None and helpDiagnostic == "N/A":
-#         print(f"La historia clinica del paciente {patientDocument} ha sido generada con exito")
-#     else:
-#         idOrder = len(hospital.orders) + 1
-#         actualOrder = Order.Order(idOrder, patientDocument, doctorDocument, date)
-#
-#         if helpDiagnostic != "N/A" and procedure == "N/A" and medicine == "N/A":
-#             handleDiagnostic(actualOrder)
-#         elif helpDiagnostic == "N/A" and procedure == "N/A" and medicine != "N/A":
-#             handleMedication(actualOrder, medicine, hospital)
-#         elif helpDiagnostic == "N/A" and medicine == "N/A" and procedure != "N/A":
-#             handleProcedure(actualOrder, procedure, hospital)
-#         elif procedure != "N/A" and medicine != "N/A" and helpDiagnostic == "N/A":
-#             handleMedication(actualOrder, medicine, hospital)
-#             handleProcedure(actualOrder, procedure, hospital)
-#         else:
-#             raise Exception("No se puede agregar una ayuda diagnostica si se esta asignando un procedimiento o medicamento")
-#         newClinicalHistory["order"] = vars(actualOrder)
-#         setOrderDetails(hospital, newClinicalHistory)
-#
-#     hospital.clinicalHistories[str(patientDocument)][date] = newClinicalHistory
-#     print(f"La historia clinica del paciente {patientDocument} ha sido generada con exito")
-#
-# def handleDiagnostic(actualOrder):
-#     item = len(actualOrder.orderHelpDiagnostics) + 1
-#     nameHelpDiagnostic = input("Ingrese el nombre del diagnostico de ayuda:\n")
-#     quantity = input("Ingrese la cantidad:\n")
-#     amount = input("Ingrese el valor:\n")
-#     specialAssistance = input("Requiere de asistencia por especialista:\n").lower() == "si"
-#     if specialAssistance:
-#             idSpecialist = setSpecialist()
-#     else:
-#         idSpecialist = None
-#     actualDiagnostic = Order.OrderHelpDiagnostic(actualOrder.id, nameHelpDiagnostic, quantity, amount, specialAssistance, idSpecialist, item)
-#     actualOrder.orderHelpDiagnostics.append(actualDiagnostic)
-#     print(f"La historia clinica del paciente {actualOrder.idPatient} ha sido generada con exito")
-#     print(f"Ayuda diagnostica agregada a la orden #{actualOrder.id}")
-#
-# def handleMedication(actualOrder, medicine, hospital):
-#     while True:
-#         item = len(actualOrder.orderMedications) + 1
-#         idMedicine = medicine.id
-#         dose = input("Ingrese la dosis del medicamento:\n")
-#         treatmentDuration = input("Ingrese la duración del tratamiento:\n")
-#         amount = medicine.price
-#         actualMedication = Order.OrderMedication(actualOrder.id, idMedicine, dose, treatmentDuration, amount, item)
-#         actualOrder.orderMedications.append(actualMedication)
-#         print(f"La orden #{actualOrder.id} del paciente se le ha asignado el medicamento {medicine.name} y sus respectivos datos con exito")
-#         if input("Desea agregar otro medicamento? (si/no)\n").lower() == "no":
-#             break
-#         medicine = input("Ingrese el nombre del medicamento:\n")
-#         medicine = getMedicine(hospital, medicine)
-#         if medicine is None:
-#             print("El medicamento no existe")
-#             break
-#
-# def handleProcedure(actualOrder, procedure, hospital):
-#     while True:
-#         item = len(actualOrder.orderProcedures) + 1
-#         idProcedure = procedure.id
-#         amount = input("Ingrese la cantidad del procedimiento:\n")
-#         frequency = input("Ingrese la frecuencia del procedimiento:\n")
-#         specialAssistance = input("¿Requiere de asistencia por especialista? (si/no)\n").lower() == "si"
-#         if specialAssistance:
-#             idSpecialist = setSpecialist()
-#         else:
-#             idSpecialist = None
-#         actualProcedure = Order.OrderProcedure(actualOrder.id, idProcedure, amount, frequency, specialAssistance, idSpecialist, item)
-#         actualOrder.orderProcedures.append(actualProcedure)
-#         print(f"La orden #{actualOrder.id} del paciente se le ha asignado el procedimiento {procedure.name} y sus respectivos datos con exito")
-#         if input("Desea agregar otro procedimiento? (si/no)\n").lower() == "no":
-#             break
-#         procedure = input("Ingrese el nombre del procedimiento:\n")
-#         procedure = getProcedure(hospital, procedure)
-#         if procedure is None:
-#             print("El procedimiento no existe")
-#             break
-#
-# def setSpecialist():
-#
-#     inventorySpecialists = {
-#         "Especialista 1": "123",
-#         "Especialista 2": "456",
-#         "Especialista 3": "789"
-#     }
-#
-#     print("Especialistas disponibles:")
-#     for specialistName in inventorySpecialists:
-#         print(f"- {specialistName}")
-#     selectedSpecialist = input("Ingrese el nombre del especialista:\n")
-#     if selectedSpecialist not in inventorySpecialists:
-#         raise Exception("El especialista no existe")
-#     idSpecialist = inventorySpecialists.get(selectedSpecialist)
-#     return idSpecialist
-#
-# def setOrderDetails(hospital, newClinicalHistory):
-#     order = newClinicalHistory["order"]
-#     if order["orderMedications"]:
-#         for index, medicationOrder in enumerate(order["orderMedications"]):
-#             order["orderMedications"][index] = (vars(medicationOrder))
-#     if order["orderProcedures"]:
-#         for index, procedureOrder in enumerate(order["orderProcedures"]):
-#             order["orderProcedures"][index] = (vars(procedureOrder))
-#     if order["orderHelpDiagnostics"]:
-#         for index, diagnosticOrder in enumerate(order["orderHelpDiagnostics"]):
-#             order["orderHelpDiagnostics"][index] = (vars(diagnosticOrder))
-#     hospital.orders.append(order)
+def generateOrderMedication(idPatient: int, idOrder: int, item: int, idMedicine: int, dose: str, treatmentDuration: str,
+                            amount: str):
+    if models.OrderHelpDiagnostic.objects.filter(idOrder=idOrder).exists():
+        raise Exception("No se puede agregar un medicamento a una orden que ya tiene ayuda diagnostica")
+    if models.Order.objects.filter(id=idOrder).exists():
+        try:
+            order = models.Order.objects.get(id=idOrder)
+            medication = models.Medication.objects.get(id=idMedicine)
+            clinicalHistory = models.ClinicalHistory.objects.get(idPatient=idPatient)
+        except Exception as e:
+            raise Exception(str(e))
+        OrderMedication = models.OrderMedication()
+        OrderMedication.idOrder = order
+        OrderMedication.idMedication = medication
+        OrderMedication.dose = dose
+        OrderMedication.treatmentDuration = treatmentDuration
+        OrderMedication.amount = amount
+        OrderMedication.item = item
+        OrderMedication.save()
+
+        orderMedicationData = {
+            key: value for key, value in vars(OrderMedication).items() if
+            key != '_state' or key != 'idOrder_id' or key != 'idMedication_id'
+        }
+
+        collection.update_one(
+            {"_id": str(idPatient)},
+            {"$set": {f"histories.{clinicalHistory.date}.order.orderMedication": orderMedicationData}}
+        )
+
+
+def generateOrderProcedure(idPatient: int, idOrder: int, item: int, procedureId: int, amount: str, frequency: str):
+    if models.OrderHelpDiagnostic.objects.filter(idOrder=idOrder).exists():
+        raise Exception("No se puede agregar un procedimiento a una orden que ya tiene ayuda diagnostica")
+    try:
+        order = models.OrderHelpDiagnostic.objects.get(id=idOrder)
+        procedure = models.OrderProcedure.objects.get(id=procedureId)
+        clinicalHistory = models.ClinicalHistory.objects.get(idPatient=idPatient)
+    except Exception as e:
+        raise Exception(str(e))
+    if models.Order.objects.filter(id=idOrder).exists():
+        OrderProcedure = models.OrderProcedure()
+        OrderProcedure.idOrder = order
+        OrderProcedure.idProcedure = procedure
+        OrderProcedure.amount = amount
+        OrderProcedure.frequency = frequency
+        OrderProcedure.item = item
+        OrderProcedure.save()
+
+        orderProcedureData = {
+            key: value for key, value in vars(OrderProcedure).items() if
+            key != '_state' or key != 'idOrder_id' or key != 'idMedication_id'
+        }
+
+        collection.update_one(
+            {"_id": str(idPatient)},
+            {"$set": {f"histories.{clinicalHistory.date}.order.orderProcedure": orderProcedureData}}
+        )
