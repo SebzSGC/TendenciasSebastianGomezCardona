@@ -16,7 +16,7 @@ def createPatient(idDocument: int, fullName: str, bornDate: str, genre: str, add
         raise Exception("El paciente ya existe")
     patient = models.Patient(idDocument, fullName, bornDate, genre, address, phoneNumber, email)
     patient.save()
-    clinicalHistory = {"_id": str(patient.idDocument), "historias": {}}
+    clinicalHistory = {"_id": str(patient.idDocument), "histories": {}}
     collection.insert_one(clinicalHistory)
 
 
