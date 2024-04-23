@@ -11,7 +11,7 @@ __pycache__/
 staticfiles/
 
 # Carpeta de migraciones de la base de datos
-*/migrations/
+project_django/hospital/hospitalApp/migrations*
 
 # Archivo de configuración local
 *.env
