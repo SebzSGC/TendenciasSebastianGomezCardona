@@ -76,6 +76,44 @@ class PatientView(View):
         return JsonResponse({"message": message}, status=status, safe=False)
 
 
+class AppointmentView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args: any, **kwargs: any):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request):
+        try:
+            body = json.loads(request.body)
+            idPatient = body.get("idPatient")
+            idDoctor = body.get("idDoctor")
+            date = body.get("date")
+            AdministrativePersonal.generateAppointment(idPatient, idDoctor, date)
+            message = "Cita creada satisfactoriamente"
+            status = 200
+        except Exception as error:
+            message = str(error)
+            status = 400
+        response = {"message": message}
+        return JsonResponse(response, status=status)
+
+    def get(self, request, date=None, idPatient=None):
+        try:
+            if idPatient is not None and date is not None:
+                response = validatorService.getAppointment(idPatient, date)
+            else:
+                response = validatorService.getAppointments()
+            status = 200
+        except ObjectDoesNotExist:
+            message = "Cita no encontrada"
+            status = 404
+            response = {"message": message}
+        except Exception as error:
+            message = str(error)
+            status = 400
+            response = {"message": message}
+        return JsonResponse(response, status=status, safe=False)
+
+
 class EmployeeView(View):
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args: any, **kwargs: any):

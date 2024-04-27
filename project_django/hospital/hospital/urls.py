@@ -20,7 +20,7 @@ import hospitalApp.views as views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('hospital/patients', views.PatientView.as_view(), name='patient post get'),
+    path('hospital/patients', views.PatientView.as_view(), name='patient post'),
     path('hospital/patients/<int:idDocument>', views.PatientView.as_view(), name="patient get put"),
     path('hospital/patients/<int:idPatient>/emergencycontact', views.EmergencyContactView.as_view(),
          name="emergency contact get post put"),
@@ -35,4 +35,6 @@ urlpatterns = [
     path('hospital/employees/doctor/<str:param>/<int:idDocument>', views.DoctorView.as_view(),
          name="doctor data patient get"),
     path('hospital/login', views.LoginView.as_view(), name="login"),
+    path('hospital/patients/appointments', views.AppointmentView.as_view(), name="appointment post"),
+    path('hospital/patients/appointments/<str:date>/<int:idDocument>', views.AppointmentView.as_view(), name="appointment get"),
 ]

@@ -64,3 +64,11 @@ def validateEmployeeByUserName(userName):
 
 def getDoctor(idDocument: int):
     return model_to_dict(models.Employee.objects.get(idDocument=idDocument, rol="Doctor"))
+
+
+def getAppointmentsById(idPatient: int) -> list | None:
+    return list(models.MedicalAppointment.objects.filter(idPatient=idPatient).values())
+
+
+def getAppointmentByIdAndDate(idPatient: int, date: str):
+    return model_to_dict(models.MedicalAppointment.objects.get(idPatient=idPatient, date=date))

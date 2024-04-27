@@ -76,17 +76,15 @@ def updateMedicalInsurance(idPatient: int, nameOfInsuranceCompany: str, policyNu
     else:
         raise Exception("El seguro medico no existe")
 
-# def generateAppointment(hospital, patient, doctor, date):
-#     if patient == None:
-#         raise Exception("El paciente no existe")
-#     if doctor == None:
-#         raise Exception("El doctor no existe")
-#     date = typeValidator.validDate(date)
-#     appointment = MedicalAppointment(patient.id, doctor.idNumber, date)
-#     hospital.appointments.append(appointment)
-#     print(f"Cita programada para el paciente: {patient.fullName}, el dia {date} con el doctor: {doctor.fullName}")
-#
-#
+
+def generateAppointment(idPatient: int, idDoctor: int, date: str):
+    if validatorService.validatePatientById(idPatient) and validatorService.validateDoctorById(idDoctor):
+        patient = validatorService.getPatientById(idPatient)
+        doctor = validatorService.getDoctor(idDoctor)
+        date = typeValidator.validDate(date)
+        appointment = MedicalAppointment(patient, doctor, date)
+        appointment.save()
+
 # def generateInvoice(hospital, patient, appointment):
 #     totalToPay = 0
 #     idDoctor = appointment["DoctorDocument"]
