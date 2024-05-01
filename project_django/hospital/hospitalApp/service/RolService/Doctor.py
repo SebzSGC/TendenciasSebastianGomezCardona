@@ -157,13 +157,13 @@ def generateOrderMedication(idPatient: int, idHistory: int, idOrder: int, item: 
         )
 
 
-def generateOrderProcedure(idPatient: int, idOrder: int, item: int, procedureId: int, amount: str, frequency: str):
+def generateOrderProcedure(idPatient: int, idHistory: int, idOrder: int, item: int, procedureId: int, amount: str, frequency: str):
     if models.OrderHelpDiagnostic.objects.filter(idOrder=idOrder).exists():
         raise Exception("No se puede agregar un procedimiento a una orden que ya tiene ayuda diagnostica")
     try:
-        order = models.OrderHelpDiagnostic.objects.get(id=idOrder)
-        procedure = models.OrderProcedure.objects.get(id=procedureId)
-        clinicalHistory = models.ClinicalHistory.objects.get(idPatient=idPatient)
+        order = models.Order.objects.get(id=idOrder)
+        procedure = models.Procedure.objects.get(id=procedureId)
+        clinicalHistory = models.ClinicalHistory.objects.get(id=idHistory)
     except Exception as e:
         raise Exception(str(e))
     if models.Order.objects.filter(id=idOrder).exists():
@@ -177,10 +177,10 @@ def generateOrderProcedure(idPatient: int, idOrder: int, item: int, procedureId:
 
         orderProcedureData = {
             key: value for key, value in vars(OrderProcedure).items() if
-            key != '_state' or key != 'idOrder_id' or key != 'idMedication_id'
+            key != '_state' and key != 'idOrder_id' and key != 'item'
         }
-
+        orderProcedureData["idProcedure_id"] = model_to_dict(OrderProcedure.idProcedure)
         collection.update_one(
             {"_id": str(idPatient)},
-            {"$set": {f"histories.{clinicalHistory.date}.order.orderProcedure": orderProcedureData}}
+            {"$set": {f"histories.{clinicalHistory.date}.order.orderProcedure.items.{str(item)}": orderProcedureData}},
         )

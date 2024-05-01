@@ -383,11 +383,12 @@ class DoctorView(View):
             elif param == "generateorderprocedure":
                 body = json.loads(request.body)
                 idOrder = body.get("idOrder")
+                idHistory = body.get("idHistory")
                 item = body.get("item")
                 idProcedure = body.get("idProcedure")
                 amount = body.get("amount")
                 frequency = body.get("frequency")
-                Doctor.generateOrderProcedure(idDocument, idOrder, item, idProcedure, amount, frequency)
+                Doctor.generateOrderProcedure(idDocument, idHistory, idOrder, item, idProcedure, amount, frequency)
                 message = "Procedimiento para la orden generada satisfactoriamente"
                 status = 200
         except Exception as error:
