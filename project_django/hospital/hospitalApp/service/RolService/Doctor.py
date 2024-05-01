@@ -39,7 +39,7 @@ def getAppointments(patientDocument: int) -> list:
 
 def generateHistory(patientDocument: int, doctorDocument: int, date: str, consultReason: str, symptomatology: str,
                     diagnosis: str):
-    if models.ClinicalHistory.objects.filter(idPatient=patientDocument, date=date).exists():
+    if models.ClinicalHistory.objects.filter(idPatient=patientDocument, date=date, idDoctor=doctorDocument).exists():
         raise Exception("Ya existe una historia clinica para el paciente en la fecha especificada")
     if validatorService.validatePatientById(patientDocument) and validatorService.validateDoctorById(
             doctorDocument) and typeValidator.validDate(date):

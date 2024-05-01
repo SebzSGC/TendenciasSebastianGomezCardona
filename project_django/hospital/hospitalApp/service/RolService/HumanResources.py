@@ -13,7 +13,9 @@ def createEmployee(fullName: str, email: str, phoneNumber: str, bornDate: str, a
         raise Exception("Dirección muy larga")
     if validatorService.validateEmployeeByUserName(userName) and userName.isalnum() and len(userName) <= 15:
         raise Exception("ya existe un empleado con ese nombre de usuario o no cumple los requisitos")
-    employee = models.Employee(fullName, email, phoneNumber, bornDate, address, rol, userName, password)
+    employee = models.Employee(fullName=fullName, email=email, phoneNumber=phoneNumber, bornDate=bornDate,
+                               address=address, rol=rol,
+                               userName=userName, password=password)
     employee.save()
 
 
