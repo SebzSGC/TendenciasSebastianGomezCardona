@@ -78,20 +78,15 @@ def generateOrder(idPatient: int, idDoctor: int, idClinicalHistory: int):
         clinicalHistory = models.ClinicalHistory.objects.get(id=idClinicalHistory)
         actualOrder = models.Order(idClinicalHistory=clinicalHistory)
         actualOrder.save()
-        orderData = {
-            key: value for key, value in vars(actualOrder).items() if key != '_state' or key != 'idClinicalHistory_id'
-        }
-
         collection.update_one(
             {"_id": str(idPatient)},
-            {"$set": {f"histories.{clinicalHistory.date}.order": orderData}}
+            {"$set": {f"histories.{clinicalHistory.date}.order": {"id": actualOrder.id}}}
         )
-
     else:
         raise Exception("No se pudo generar la orden, valida los datos")
 
 
-def generateOrderHelpDiagnostic(idPatient: int, idOrder: int, item: int, helpDiagnostic: str, quantity: int,
+def generateOrderHelpDiagnostic(idPatient: int, idHistory: int, idOrder: int, item: int, helpDiagnostic: str, quantity: int,
                                 amount: float):
     if models.OrderMedication.objects.filter(idOrder=idOrder).exists():
         raise Exception("No se puede agregar una ayuda diagnostica a una orden que ya tiene medicamentos")
@@ -99,7 +94,7 @@ def generateOrderHelpDiagnostic(idPatient: int, idOrder: int, item: int, helpDia
         raise Exception("No se puede agregar una ayuda diagnostica a una orden que ya tiene procedimientos")
     if models.Order.objects.filter(id=idOrder).exists():
         try:
-            clinicalHistory = models.ClinicalHistory.objects.get(idPatient=idPatient)
+            clinicalHistory = models.ClinicalHistory.objects.get(id=idHistory)
             order = models.Order.objects.get(id=idOrder)
         except Exception as e:
             raise Exception(str(e))
@@ -113,14 +108,14 @@ def generateOrderHelpDiagnostic(idPatient: int, idOrder: int, item: int, helpDia
 
         helpDiagnosticData = {
             key: value for key, value in vars(OrderHelpDiagnostic).items() if
-            key != '_state' or key != 'idClinicalHistory_id' or key != 'idOrder_id'
+            key != '_state' and key != 'idClinicalHistory_id' and key != 'idOrder_id' and key != 'item'
         }
-
         collection.update_one(
             {"_id": str(idPatient)},
-            {"$set": {f"histories.{clinicalHistory.date}.order.helpDiagnostic": helpDiagnosticData}}
+            {"$set": {f"histories.{clinicalHistory.date}.order.helpDiagnostic.items": {str(item): helpDiagnosticData}}}
         )
-
+    else:
+        raise Exception("No existe esa orden especificada")
 
 #
 def generateOrderMedication(idPatient: int, idOrder: int, item: int, idMedicine: int, dose: str, treatmentDuration: str,

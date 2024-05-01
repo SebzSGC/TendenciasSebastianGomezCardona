@@ -356,11 +356,13 @@ class DoctorView(View):
             elif param == "generateorderhelpdiagnostic":
                 body = json.loads(request.body)
                 idOrder = body.get("idOrder")
+                idHistory = body.get("idHistory")
                 helpDiagnostic = body.get("helpDiagnostic")
+                item = body.get("item")
                 quantity = body.get("quantity")
                 amount = body.get("amount")
                 Doctor.generateOrderHelpDiagnostic(
-                    idDocument, idOrder, helpDiagnostic, quantity, amount
+                    idDocument, idHistory, idOrder, item, helpDiagnostic, quantity, amount
                 )
                 message = "ayuda diagnostica para la orden generada satisfactoriamente"
                 status = 200
