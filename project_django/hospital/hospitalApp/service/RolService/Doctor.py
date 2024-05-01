@@ -30,11 +30,12 @@ def getAppointmentsMade(idDocument: int) -> list:
 
 
 def getAppointments(patientDocument: int) -> list:
-    if validatorService.validatePatientById(patientDocument):
-        appointments = models.MedicalAppointment.objects.values().filter(idPatient=patientDocument)
-        return list(appointments)
+    appointments = list(models.MedicalAppointment.objects.values().filter(idPatient=patientDocument))
+    if len(appointments) > 0:
+        return appointments
     else:
         raise Exception("No se encontraron citas para el paciente")
+
 
 
 def generateHistory(patientDocument: int, doctorDocument: int, date: str, consultReason: str, symptomatology: str,
@@ -157,7 +158,8 @@ def generateOrderMedication(idPatient: int, idHistory: int, idOrder: int, item: 
         )
 
 
-def generateOrderProcedure(idPatient: int, idHistory: int, idOrder: int, item: int, procedureId: int, amount: str, frequency: str):
+def generateOrderProcedure(idPatient: int, idHistory: int, idOrder: int, item: int, procedureId: int, amount: str,
+                           frequency: str):
     if models.OrderHelpDiagnostic.objects.filter(idOrder=idOrder).exists():
         raise Exception("No se puede agregar un procedimiento a una orden que ya tiene ayuda diagnostica")
     try:

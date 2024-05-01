@@ -308,24 +308,36 @@ class MedicalInsuranceView(View):
 
 
 class DoctorView(View):
+    PARAM_GENERATE_HISTORY = "generatehistory"
+    PARAM_GENERATE_ORDER = "generateorder"
+    PARAM_GENERATE_ORDER_HELP_DIAGNOSTIC = "generateorderhelpdiagnostic"
+    PARAM_GENERATE_ORDER_MEDICATION = "generateordermedication"
+    PARAM_GENERATE_ORDER_PROCEDURE = "generateorderprocedure"
+    PARAM_CLINICAL_HISTORY = "clinicalhistory"
+    PARAM_BASIC_PATIENT_INFO = "patientdata"
+    PARAM_APPOINTMENTS_MADE = "appointmentsmade"
+    PARAM_APPOINTMENTS = "appointments"
+
+
+    def _handle_get_request(self, param, idDocument):
+        if idDocument is None:
+            raise Exception("Falta un parametro")
+        if param == self.PARAM_CLINICAL_HISTORY:
+            return Doctor.getPatientClinicalHistory(idDocument)
+        elif param == self.PARAM_BASIC_PATIENT_INFO:
+            return Doctor.getBasicPatientInfo(idDocument)
+        elif param == self.PARAM_APPOINTMENTS_MADE:
+            return Doctor.getAppointmentsMade(idDocument)
+        elif param == self.PARAM_APPOINTMENTS:
+            return Doctor.getAppointments(idDocument)
+
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args: any, **kwargs: any):
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, param, idDocument=None):
         try:
-            if idDocument is not None:
-                response = Doctor.getBasicPatientInfo(idDocument)
-            elif param == "clinicalhistory" and idDocument is not None:
-                response = Doctor.getPatientClinicalHistory(idDocument)
-            elif param == "patientdata" and idDocument is not None:
-                response = Doctor.getBasicPatientInfo(idDocument)
-            elif param == "appointmentsMade" and idDocument is not None:
-                response = Doctor.getAppointmentsMade(idDocument)
-            elif param == "appointments" and idDocument is not None:
-                response = Doctor.getAppointments(idDocument)
-            else:
-                response = {"message": "Parametro no valido"}
+            response = self._handle_get_request(param, idDocument)
         except Exception as error:
             return JsonResponse({"message": str(error)}, status=400)
         return JsonResponse(response, status=200, safe=False)
@@ -383,12 +395,11 @@ class DoctorView(View):
             elif param == "generateorderprocedure":
                 body = json.loads(request.body)
                 idOrder = body.get("idOrder")
-                idHistory = body.get("idHistory")
                 item = body.get("item")
                 idProcedure = body.get("idProcedure")
                 amount = body.get("amount")
                 frequency = body.get("frequency")
-                Doctor.generateOrderProcedure(idDocument, idHistory, idOrder, item, idProcedure, amount, frequency)
+                Doctor.generateOrderProcedure(idDocument, idOrder, item, idProcedure, amount, frequency)
                 message = "Procedimiento para la orden generada satisfactoriamente"
                 status = 200
         except Exception as error:
