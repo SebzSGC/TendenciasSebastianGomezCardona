@@ -318,6 +318,58 @@ class DoctorView(View):
     PARAM_APPOINTMENTS_MADE = "appointmentsmade"
     PARAM_APPOINTMENTS = "appointments"
 
+    def _handle_post_request(self, param, idDocument, body):
+        body = json.loads(body)
+        if param == self.PARAM_GENERATE_HISTORY:
+            doctorDocument = body.get("doctorDocument")
+            date = body.get("date")
+            consultReason = body.get("consultReason")
+            symptomatology = body.get("symptomatology")
+            diagnosis = body.get("diagnosis")
+            Doctor.generateHistory(
+                idDocument, doctorDocument, date, consultReason, symptomatology, diagnosis
+            )
+            return "Historia clínica generada satisfactoriamente", 200
+        elif param == self.PARAM_GENERATE_ORDER:
+            idDoctor = body.get("idDoctor")
+            idClinicalHistory = body.get("idClinicalHistory")
+            Doctor.generateOrder(
+                idDocument, idDoctor, idClinicalHistory
+            )
+            return "Orden generada satisfactoriamente", 200
+        elif param == self.PARAM_GENERATE_ORDER_HELP_DIAGNOSTIC:
+            idOrder = body.get("idOrder")
+            idHistory = body.get("idHistory")
+            helpDiagnostic = body.get("helpDiagnostic")
+            item = body.get("item")
+            quantity = body.get("quantity")
+            amount = body.get("amount")
+            Doctor.generateOrderHelpDiagnostic(
+                idDocument, idHistory, idOrder, item, helpDiagnostic, quantity, amount
+            )
+            return "ayuda diagnostica para la orden generada satisfactoriamente", 200
+        elif param == self.PARAM_GENERATE_ORDER_MEDICATION:
+            idOrder = body.get("idOrder")
+            idHistory = body.get("idHistory")
+            item = body.get("item")
+            idMedication = body.get("idMedication")
+            dose = body.get("dose")
+            treatmentDuration = body.get("treatmentDuration")
+            amount = body.get("amount")
+            Doctor.generateOrderMedication(
+                idDocument, idHistory, idOrder, item, idMedication, dose, treatmentDuration, amount
+            )
+            return "Medicamento para la orden generada satisfactoriamente", 200
+        elif param == self.PARAM_GENERATE_ORDER_PROCEDURE:
+            idOrder = body.get("idOrder")
+            item = body.get("item")
+            idProcedure = body.get("idProcedure")
+            amount = body.get("amount")
+            frequency = body.get("frequency")
+            Doctor.generateOrderProcedure(idDocument, idOrder, item, idProcedure, amount, frequency)
+            return "Procedimiento para la orden generada satisfactoriamente", 200
+        else:
+            return "Parametro no valido", 400
 
     def _handle_get_request(self, param, idDocument):
         if idDocument is None:
@@ -344,64 +396,7 @@ class DoctorView(View):
 
     def post(self, request, param, idDocument):
         try:
-            if param == "generatehistory":
-                body = json.loads(request.body)
-                doctorDocument = body.get("doctorDocument")
-                date = body.get("date")
-                consultReason = body.get("consultReason")
-                symptomatology = body.get("symptomatology")
-                diagnosis = body.get("diagnosis")
-                Doctor.generateHistory(
-                    idDocument, doctorDocument, date, consultReason, symptomatology, diagnosis
-                )
-                message = "Historia clínica generada satisfactoriamente"
-                status = 200
-            elif param == "generateorder":
-                body = json.loads(request.body)
-                idDoctor = body.get("idDoctor")
-                idClinicalHistory = body.get("idClinicalHistory")
-                Doctor.generateOrder(
-                    idDocument, idDoctor, idClinicalHistory
-                )
-                message = "Orden generada satisfactoriamente"
-                status = 200
-            elif param == "generateorderhelpdiagnostic":
-                body = json.loads(request.body)
-                idOrder = body.get("idOrder")
-                idHistory = body.get("idHistory")
-                helpDiagnostic = body.get("helpDiagnostic")
-                item = body.get("item")
-                quantity = body.get("quantity")
-                amount = body.get("amount")
-                Doctor.generateOrderHelpDiagnostic(
-                    idDocument, idHistory, idOrder, item, helpDiagnostic, quantity, amount
-                )
-                message = "ayuda diagnostica para la orden generada satisfactoriamente"
-                status = 200
-            elif param == "generateordermedication":
-                body = json.loads(request.body)
-                idOrder = body.get("idOrder")
-                idHistory = body.get("idHistory")
-                item = body.get("item")
-                idMedication = body.get("idMedication")
-                dose = body.get("dose")
-                treatmentDuration = body.get("treatmentDuration")
-                amount = body.get("amount")
-                Doctor.generateOrderMedication(
-                    idDocument, idHistory, idOrder, item, idMedication, dose, treatmentDuration, amount
-                )
-                message = "Medicamento para la orden generada satisfactoriamente"
-                status = 200
-            elif param == "generateorderprocedure":
-                body = json.loads(request.body)
-                idOrder = body.get("idOrder")
-                item = body.get("item")
-                idProcedure = body.get("idProcedure")
-                amount = body.get("amount")
-                frequency = body.get("frequency")
-                Doctor.generateOrderProcedure(idDocument, idOrder, item, idProcedure, amount, frequency)
-                message = "Procedimiento para la orden generada satisfactoriamente"
-                status = 200
+            message, status = self._handle_post_request(param, idDocument, request.body)
         except Exception as error:
             message = str(error)
             status = 400
