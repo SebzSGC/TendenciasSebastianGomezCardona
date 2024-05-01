@@ -86,7 +86,8 @@ def generateOrder(idPatient: int, idDoctor: int, idClinicalHistory: int):
         raise Exception("No se pudo generar la orden, valida los datos")
 
 
-def generateOrderHelpDiagnostic(idPatient: int, idHistory: int, idOrder: int, item: int, helpDiagnostic: str, quantity: int,
+def generateOrderHelpDiagnostic(idPatient: int, idHistory: int, idOrder: int, item: int, helpDiagnostic: str,
+                                quantity: int,
                                 amount: float):
     if models.OrderMedication.objects.filter(idOrder=idOrder).exists():
         raise Exception("No se puede agregar una ayuda diagnostica a una orden que ya tiene medicamentos")
@@ -117,8 +118,10 @@ def generateOrderHelpDiagnostic(idPatient: int, idHistory: int, idOrder: int, it
     else:
         raise Exception("No existe esa orden especificada")
 
+
 #
-def generateOrderMedication(idPatient: int, idOrder: int, item: int, idMedicine: int, dose: str, treatmentDuration: str,
+def generateOrderMedication(idPatient: int, idHistory: int, idOrder: int, item: int, idMedicine: int, dose: str,
+                            treatmentDuration: str,
                             amount: str):
     if models.OrderHelpDiagnostic.objects.filter(idOrder=idOrder).exists():
         raise Exception("No se puede agregar un medicamento a una orden que ya tiene ayuda diagnostica")
@@ -126,7 +129,7 @@ def generateOrderMedication(idPatient: int, idOrder: int, item: int, idMedicine:
         try:
             order = models.Order.objects.get(id=idOrder)
             medication = models.Medication.objects.get(id=idMedicine)
-            clinicalHistory = models.ClinicalHistory.objects.get(idPatient=idPatient)
+            clinicalHistory = models.ClinicalHistory.objects.get(id=idHistory)
         except Exception as e:
             raise Exception(str(e))
         OrderMedication = models.OrderMedication()
@@ -140,12 +143,15 @@ def generateOrderMedication(idPatient: int, idOrder: int, item: int, idMedicine:
 
         orderMedicationData = {
             key: value for key, value in vars(OrderMedication).items() if
-            key != '_state' or key != 'idOrder_id' or key != 'idMedication_id'
+            key != '_state' and key != 'idOrder_id' and key != 'item'
         }
+
+        orderMedicationData["idMedication_id"] = model_to_dict(medication)
 
         collection.update_one(
             {"_id": str(idPatient)},
-            {"$set": {f"histories.{clinicalHistory.date}.order.orderMedication": orderMedicationData}}
+            {"$set": {
+                f"histories.{clinicalHistory.date}.order.orderMedication.items": {str(item): orderMedicationData}}}
         )
 
 

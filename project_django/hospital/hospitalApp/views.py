@@ -369,13 +369,14 @@ class DoctorView(View):
             elif param == "generateordermedication":
                 body = json.loads(request.body)
                 idOrder = body.get("idOrder")
+                idHistory = body.get("idHistory")
                 item = body.get("item")
                 idMedication = body.get("idMedication")
                 dose = body.get("dose")
                 treatmentDuration = body.get("treatmentDuration")
                 amount = body.get("amount")
                 Doctor.generateOrderMedication(
-                    idDocument, idOrder, item, idMedication, dose, treatmentDuration, amount
+                    idDocument, idHistory, idOrder, item, idMedication, dose, treatmentDuration, amount
                 )
                 message = "Medicamento para la orden generada satisfactoriamente"
                 status = 200
