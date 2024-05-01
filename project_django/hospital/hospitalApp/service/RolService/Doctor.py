@@ -113,7 +113,9 @@ def generateOrderHelpDiagnostic(idPatient: int, idHistory: int, idOrder: int, it
         }
         collection.update_one(
             {"_id": str(idPatient)},
-            {"$set": {f"histories.{clinicalHistory.date}.order.helpDiagnostic.items": {str(item): helpDiagnosticData}}}
+            {"$set": {
+                f"histories.{clinicalHistory.date}.order.helpDiagnostic.items.{str(item)}": helpDiagnosticData}},
+            upsert=True
         )
     else:
         raise Exception("No existe esa orden especificada")
@@ -151,7 +153,7 @@ def generateOrderMedication(idPatient: int, idHistory: int, idOrder: int, item: 
         collection.update_one(
             {"_id": str(idPatient)},
             {"$set": {
-                f"histories.{clinicalHistory.date}.order.orderMedication.items": {str(item): orderMedicationData}}}
+                f"histories.{clinicalHistory.date}.order.orderMedication.items.{str(item)}": orderMedicationData}},
         )
 
 
