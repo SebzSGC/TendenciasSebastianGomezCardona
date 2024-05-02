@@ -317,6 +317,7 @@ class DoctorView(View):
     PARAM_BASIC_PATIENT_INFO = "patientdata"
     PARAM_APPOINTMENTS_MADE = "appointmentsmade"
     PARAM_APPOINTMENTS = "appointments"
+    PARAM_ORDERS = "orders"
 
     def _handle_post_request(self, param, idDocument, body):
         body = json.loads(body)
@@ -382,6 +383,8 @@ class DoctorView(View):
             return Doctor.getAppointmentsMade(idDocument)
         elif param == self.PARAM_APPOINTMENTS:
             return Doctor.getAppointments(idDocument)
+        elif param == self.PARAM_ORDERS:
+            return validatorService.getOrdersByIdPatient(idDocument)
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args: any, **kwargs: any):

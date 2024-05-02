@@ -1,5 +1,6 @@
 from hospitalApp import models
 from django.forms.models import model_to_dict
+from hospital.connection_mongo import collection
 
 
 def validatePatientById(idDocument: int) -> bool:
@@ -72,3 +73,19 @@ def getAppointmentsById(idPatient: int) -> list | None:
 
 def getAppointmentByIdAndDate(idPatient: int, date: str):
     return model_to_dict(models.MedicalAppointment.objects.get(idPatient=idPatient, date=date))
+
+
+def getOrdersByIdPatient(idPatient: int):
+    dates = list(models.ClinicalHistory.objects.filter(idPatient=idPatient).values_list('date', flat=True))
+    orders = []
+    for date in dates:
+        order = collection.find_one({
+            "_id": str(idPatient),
+            f"histories.{date}.order": {"$exists": True}
+        })
+        if order:
+            orders.append(order["histories"][date]["order"])
+    if orders:
+        return orders
+    else:
+        raise Exception("No se encontraron órdenes para el paciente en ninguna fecha")
