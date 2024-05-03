@@ -36,6 +36,8 @@ urlpatterns = [
     ##@param: patientdata or clinicalhistory or appointmentsMade or appointments or generatehistory
     path('hospital/employees/doctor/<str:param>/<int:idDocument>', views.DoctorView.as_view(),
          name="doctor data patient get"),
+    path('hospital/employees/nurse/<str:param>/<int:idDocument>', views.DoctorView.as_view(),
+         name="nurse orders patient get"),
     path('hospital/login', views.LoginView.as_view(), name="login"),
     path('hospital/patients/appointments', views.AppointmentView.as_view(), name="appointment post"),
     path('hospital/patients/appointments/<str:date>/<int:idDocument>', views.AppointmentView.as_view(), name="appointment get"),

@@ -1,42 +1,21 @@
-# import datetime
-# from model.User import VitalData
-# from model.ClinicalVisit import ClinicalVisit
-# from HospitalApp.service.RolService.AdministrativePersonal import validatePatientId
-# from HospitalApp.service.RolService.Doctor import getMedicine, getProcedure
-#
-# def getOrdersByIdPatient(hospital, idPatient):
-#     orders = hospital.orders
-#     filteredOrders = []
-#     filteredOrders = [dictionary for dictionary in orders if dictionary.get("idPatient") == idPatient]
-#     return filteredOrders
-#
-# def getOrdersMedication(medication, orders):
-#     if medication is None:
-#         return None
-#     order = []
-#     for actualOrder in orders:
-#         if actualOrder.get("orderMedications") == []:
-#             continue
-#         orderMedications = actualOrder.get("orderMedications", [])
-#         if orderMedications["idMedication"] == medication.id:
-#             order.append(orderMedications)
-#     if order == []:
-#         raise Exception("El procedimiento no existe en ninguna orden")
-#     return order
-#
-# def getOrdersProcedures(procedure, orders):
-#     if procedure is None:
-#         return None
-#     order = []
-#     for actualOrder in orders:
-#         if actualOrder.get("orderProcedures") == []:
-#             continue
-#         orderProcedures = actualOrder.get("orderProcedures", [])
-#         if orderProcedures["idProcedure"] == procedure.id:
-#             order.append(orderProcedures)
-#     if order == []:
-#         raise Exception("El procedimiento no existe en ninguna orden")
-#     return order
+from hospital.connection_mongo import collection
+from hospitalApp import models
+
+
+def getOrdersByIdPatient(idPatient: int):
+    dates = list(models.ClinicalHistory.objects.filter(idPatient=idPatient).values_list('date', flat=True))
+    orders = []
+    for date in dates:
+        order = collection.find_one({
+            "_id": str(idPatient),
+            f"histories.{date}.order": {"$exists": True}
+        })
+        if order:
+            orders.append(order["histories"][date]["order"])
+    if orders:
+        return orders
+    else:
+        raise Exception("No se encontraron órdenes para el paciente en ninguna fecha")
 #
 # def registerVitalDataForPatient(hospital, idUser, arterialPressure, temperature, pulse, bloodOxygenLevel, medication, procedure):
 #     if not validatePatientId(hospital, idUser):
