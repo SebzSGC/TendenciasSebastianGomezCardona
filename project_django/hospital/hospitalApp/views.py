@@ -404,7 +404,12 @@ class DoctorView(View):
 
 
 class NurseView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args: any, **kwargs: any):
+        return super().dispatch(request, *args, **kwargs)
+
     PARAM_POST_VITAL_DATA = "vitaldata"
+    PARAM_POST_MEDICINE_VISIT = "vicitmedicine"
     PARAM_ORDERS = "orders"
 
     def _handle_get_request(self, param, idDocument):
@@ -420,12 +425,14 @@ class NurseView(View):
             bloodOxygenLevel = body.get("bloodOxygenLevel")
             Nurse.registerVitalDataForPatient(idDocument, arterialPressure, temperature, pulse, bloodOxygenLevel)
             return "Datos vitales registrados satisfactoriamente", 200
+        elif param == self.PARAM_POST_MEDICINE_VISIT:
+            idOrder = body.get("idOrder")
+            item = body.get("item")
+            dateVisit = body.get("dateVisit")
+            Nurse.registerMedicineFromOrder(idOrder, item, idDocument, dateVisit)
+            return "Medicamento registrado en la visita satisfactoriamente", 200
         else:
             return "Parametro no valido", 400
-
-    @method_decorator(csrf_exempt)
-    def dispatch(self, request, *args: any, **kwargs: any):
-        return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, param, idDocument=None):
         try:

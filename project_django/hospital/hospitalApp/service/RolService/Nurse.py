@@ -1,3 +1,5 @@
+from django.forms import model_to_dict
+
 from hospital.connection_mongo import collection, collection_appointment
 from hospitalApp import models
 from hospitalApp.service import validatorService
@@ -47,48 +49,55 @@ def registerVitalDataForPatient(idPatient: int, arterialPressure: float, tempera
     })
 
 
-# def selectDictionaryByOrderId(vectors):
-#     if vectors is None or vectors == [] or vectors == "N/A":
-#         return "N/A"
-#     if 'idMedication' in vectors[0]:
-#         print("IDs de ordenes que contienen el medicamento suministrado, porfavor elija la correcta.")
-#     else:
-#         print("IDs de ordenes que contienen el procedimiento realizado, porfavor elija la correcta:")
-#     id_positions = {vector["idOrder"]: idx for idx, vector in enumerate(vectors)}
-#     for id_order in id_positions.keys():
-#         print(f"Orden #{id_order} = {id_order}")
-#     selected_id = input("Ingrese el ID de la orden que desea seleccionar: ")
-#     selected_position = id_positions.get(selected_id)
-#     if selected_position is not None:
-#         return vectors[selected_position]
-#     else:
-#         return None
-#
-#
-# def print_all(clinicalVisit):
-#     print("Datos vitales:")
-#     print(" Documento del paciente: ", clinicalVisit.vitalData.idPatient)
-#     print(" Presion arterial: ", clinicalVisit.vitalData.arterialPressure)
-#     print(" Temperatura: ", clinicalVisit.vitalData.temperature)
-#     print(" Pulso: ", clinicalVisit.vitalData.pulse)
-#     print(" Nivel de oxigeno en la sangre: ", clinicalVisit.vitalData.bloodOxygenLevel)
-#     print("Medicina administrada:")
-#     if clinicalVisit.medication != "N/A":
-#         printMedicines(clinicalVisit.medication)
-#     else:
-#         print(clinicalVisit.medication)
-#     print("Procedimientos:")
-#     if clinicalVisit.procedure != "N/A":
-#         printProcedures(clinicalVisit.procedure)
-#     else:
-#         print(clinicalVisit.procedure)
-#
-#
-# def printMedicines(medication):
-#     for key, value in medication.items():
-#         print(f" {key}: {value}")
+def registerMedicineFromOrder(orderId: int, item: int, idPatient: int, dateVisit: str):
+    if not validatorService.validatePatientById(idPatient):
+        raise Exception("El paciente no existe")
+    if not models.OrderMedication.objects.filter(item=item, idOrder=orderId).exists():
+        raise Exception("El medicamento no existe en la orden")
+    if not models.ClinicalVisit.objects.filter(idPatient=idPatient, date=dateVisit).exists():
+        raise Exception("La fecha de visita no existe")
+    orderMedication = models.OrderMedication.objects.select_related("idMedication").get(item=item, idOrder=orderId)
+    orderMedicationToDict = model_to_dict(orderMedication)
+    medicationToDict = model_to_dict(orderMedication.idMedication)
+    for key in orderMedicationToDict.keys():
+        if key in medicationToDict:
+            del medicationToDict[key]
+
+    if "idMedication" in orderMedicationToDict:
+        del orderMedicationToDict["idMedication"]
+    data = {
+        "OrderMedication": orderMedicationToDict,
+        "Medication": medicationToDict
+    }
+
+    collection_appointment.update_one(
+        {"_id": str(idPatient)},
+        {"$set": {f"appointments.{dateVisit}.medication": data}}
+    )
 
 
-def printProcedures(procedures):
-    for key, value in procedures.items():
-        print(f" {key}: {value}")
+def registerProcedureFromOrder(orderId: int, item: int, idPatient: int, dateVisit: str):
+    if not validatorService.validatePatientById(idPatient):
+        raise Exception("El paciente no existe")
+    if not models.OrderProcedure.objects.filter(item=item, idOrder=orderId).exists():
+        raise Exception("El procedimiento no existe en la orden")
+    if not models.ClinicalVisit.objects.filter(idPatient=idPatient, date=dateVisit).exists():
+        raise Exception("La fecha de visita no existe")
+    orderProcedure = models.OrderProcedure.objects.select_related("idProcedure").get(item=item, idOrder=orderId)
+    orderProcedureToDict = model_to_dict(orderProcedure)
+    procedureToDict = model_to_dict(orderProcedure.idMedication)
+    for key in orderProcedureToDict.keys():
+        if key in procedureToDict:
+            del procedureToDict[key]
+
+    if "idProcedure" in orderProcedureToDict:
+        del orderProcedureToDict["idProcedure"]
+    data = {
+        "OrderProcedure": orderProcedureToDict,
+        "Procedure": procedureToDict
+    }
+
+    collection_appointment.update_one(
+        {"_id": str(idPatient)},
+        {"$set": {f"appointments.{dateVisit}.procedure": data}}
+    )
