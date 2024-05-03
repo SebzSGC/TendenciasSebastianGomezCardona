@@ -147,7 +147,8 @@ class ClinicalVisit(models.Model):
     idPatient = models.ForeignKey(Patient, on_delete=models.CASCADE, to_field='idDocument', db_column='idPatient',
                                   related_name='clinicalVisit_patient')
     date = models.CharField(max_length=30)
-    vitalData = models.ForeignKey(VitalData, on_delete=models.CASCADE)
+    vitalData = models.ForeignKey(VitalData, on_delete=models.CASCADE, to_field='id', db_column='idVitalData',
+                                  related_name='clinicalVisit_vitalData')
 
 
 class OrderMedicationVisit(models.Model):

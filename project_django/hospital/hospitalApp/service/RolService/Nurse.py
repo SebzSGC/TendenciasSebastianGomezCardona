@@ -1,44 +1,52 @@
-from hospital.connection_mongo import collection
+from hospital.connection_mongo import collection, collection_appointment
 from hospitalApp import models
+from hospitalApp.service import validatorService
+from datetime import datetime
 
 
 def getOrdersByIdPatient(idPatient: int):
-    dates = list(models.ClinicalHistory.objects.filter(idPatient=idPatient).values_list('date', flat=True))
-    orders = []
+    orders_with_dates = []
+    dates = collection.find_one({"_id": str(idPatient)})["histories"].keys()
     for date in dates:
         order = collection.find_one({
             "_id": str(idPatient),
             f"histories.{date}.order": {"$exists": True}
         })
         if order:
-            orders.append(order["histories"][date]["order"])
-    if orders:
-        return orders
+            order_data = {
+                "date": date,
+                "orders": order["histories"][date]["order"]
+            }
+            orders_with_dates.append(order_data)
+    if orders_with_dates:
+        return orders_with_dates
     else:
         raise Exception("No se encontraron órdenes para el paciente en ninguna fecha")
-#
-# def registerVitalDataForPatient(hospital, idUser, arterialPressure, temperature, pulse, bloodOxygenLevel, medication, procedure):
-#     if not validatePatientId(hospital, idUser):
-#         raise Exception("El paciente no existe")
-#
-#     medication = getMedicine(hospital, medication)
-#     procedure = getProcedure(hospital, procedure)
-#
-#     orders = getOrdersByIdPatient(hospital, idUser)
-#     orderMedication = getOrdersMedication(medication, orders) if orders and medication else None
-#     orderProcedure = getOrdersProcedures(procedure, orders) if orders and procedure else None
-#
-#     vitalData = VitalData(idUser, arterialPressure, temperature, pulse, bloodOxygenLevel)
-#     date = datetime.datetime.today().strftime("%d/%m/%Y %H:%M")
-#     clinicalVisit = ClinicalVisit(idUser, date, vitalData)
-#
-#     clinicalVisit.medication = selectDictionaryByOrderId(orderMedication) if orderMedication else "N/A"
-#     clinicalVisit.procedure = selectDictionaryByOrderId(orderProcedure) if orderProcedure else "N/A"
-#
-#     hospital.patientVisits.append(clinicalVisit)
-#     print("Datos de la visita clinica registrados exitosamente")
-#
-#
+
+
+def registerVitalDataForPatient(idPatient: int, arterialPressure: float, temperature: float, pulse: int,
+                                bloodOxygenLevel: float):
+    if not validatorService.validatePatientById(idPatient):
+        raise Exception("El paciente no existe")
+
+    patient = models.Patient(**validatorService.getPatientById(idPatient))
+    vitalData = models.VitalData(None, idPatient, arterialPressure, temperature, pulse, bloodOxygenLevel)
+    vitalData.save()
+    date = datetime.today().strftime("%d/%m/%Y %H:%M")
+    clinicalVisit = models.ClinicalVisit(idPatient=patient, date=date, vitalData=vitalData)
+    clinicalVisit.save()
+
+    vitalData = {
+        key: value for key, value in vars(vitalData).items() if key != '_state' and key != 'idPatient_id'
+    }
+    collection_appointment.insert_one({
+        "_id": str(idPatient),
+        "appointments": {
+            date: {"vitalData": vitalData}
+        }
+    })
+
+
 # def selectDictionaryByOrderId(vectors):
 #     if vectors is None or vectors == [] or vectors == "N/A":
 #         return "N/A"
@@ -56,13 +64,14 @@ def getOrdersByIdPatient(idPatient: int):
 #     else:
 #         return None
 #
+#
 # def print_all(clinicalVisit):
 #     print("Datos vitales:")
-#     print(" Documento del paciente: ",clinicalVisit.vitalData.idUser)
-#     print(" Presion arterial: ",clinicalVisit.vitalData.arterialPressure)
-#     print(" Temperatura: ",clinicalVisit.vitalData.temperature)
-#     print(" Pulso: ",clinicalVisit.vitalData.pulse)
-#     print(" Nivel de oxigeno en la sangre: ",clinicalVisit.vitalData.bloodOxygenLevel)
+#     print(" Documento del paciente: ", clinicalVisit.vitalData.idPatient)
+#     print(" Presion arterial: ", clinicalVisit.vitalData.arterialPressure)
+#     print(" Temperatura: ", clinicalVisit.vitalData.temperature)
+#     print(" Pulso: ", clinicalVisit.vitalData.pulse)
+#     print(" Nivel de oxigeno en la sangre: ", clinicalVisit.vitalData.bloodOxygenLevel)
 #     print("Medicina administrada:")
 #     if clinicalVisit.medication != "N/A":
 #         printMedicines(clinicalVisit.medication)
@@ -74,10 +83,12 @@ def getOrdersByIdPatient(idPatient: int):
 #     else:
 #         print(clinicalVisit.procedure)
 #
-# def printMedicines(medication):
-#         for key, value in medication.items():
-#              print(f" {key}: {value}")
 #
-# def printProcedures(procedures):
-#         for key, value in procedures.items():
-#             print(f" {key}: {value}")
+# def printMedicines(medication):
+#     for key, value in medication.items():
+#         print(f" {key}: {value}")
+
+
+def printProcedures(procedures):
+    for key, value in procedures.items():
+        print(f" {key}: {value}")

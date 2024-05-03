@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from hospitalApp.service import validatorService, loginService
-from hospitalApp.service.RolService import AdministrativePersonal, HumanResources, Doctor
+from hospitalApp.service.RolService import AdministrativePersonal, HumanResources, Doctor, Nurse
 
 
 # Create your views here.
@@ -404,11 +404,24 @@ class DoctorView(View):
 
 
 class NurseView(View):
+    PARAM_POST_VITAL_DATA = "vitaldata"
     PARAM_ORDERS = "orders"
 
     def _handle_get_request(self, param, idDocument):
         if param == self.PARAM_ORDERS:
-            return validatorService.getOrdersByIdPatient(idDocument)
+            return Nurse.getOrdersByIdPatient(idDocument)
+
+    def _handle_post_request(self, param, idDocument, body):
+        body = json.loads(body)
+        if param == self.PARAM_POST_VITAL_DATA:
+            arterialPressure = body.get("arterialPressure")
+            temperature = body.get("temperature")
+            pulse = body.get("pulse")
+            bloodOxygenLevel = body.get("bloodOxygenLevel")
+            Nurse.registerVitalDataForPatient(idDocument, arterialPressure, temperature, pulse, bloodOxygenLevel)
+            return "Datos vitales registrados satisfactoriamente", 200
+        else:
+            return "Parametro no valido", 400
 
     @method_decorator(csrf_exempt)
     def dispatch(self, request, *args: any, **kwargs: any):
@@ -420,6 +433,14 @@ class NurseView(View):
         except Exception as error:
             return JsonResponse({"message": str(error)}, status=400)
         return JsonResponse(response, status=200, safe=False)
+
+    def post(self, request, param, idDocument=None):
+        try:
+            message, status = self._handle_post_request(param, idDocument, request.body)
+        except Exception as error:
+            message = {"message": str(error)}
+            status = 400
+        return JsonResponse({"message": message}, status=status, safe=False)
 
 
 class LoginView(View):
