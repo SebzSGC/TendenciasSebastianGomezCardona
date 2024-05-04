@@ -38,6 +38,8 @@ urlpatterns = [
          name="doctor data patient get"),
     path('hospital/employees/nurse/<str:param>/<int:idDocument>', views.NurseView.as_view(),
          name="nurse orders patient get"),
+    path('hospital/employees/support/<str:param>', views.SupportView.as_view(),
+         name="support post and get"),
     path('hospital/login', views.LoginView.as_view(), name="login"),
     path('hospital/patients/appointments', views.AppointmentView.as_view(), name="appointment post"),
     path('hospital/patients/appointments/<str:date>/<int:idDocument>', views.AppointmentView.as_view(), name="appointment get"),

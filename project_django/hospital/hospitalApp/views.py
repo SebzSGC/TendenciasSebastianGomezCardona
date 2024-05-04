@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from hospitalApp.service import validatorService, loginService
-from hospitalApp.service.RolService import AdministrativePersonal, HumanResources, Doctor, Nurse
+from hospitalApp.service.RolService import AdministrativePersonal, HumanResources, Doctor, Nurse, InformationSupport
 
 
 # Create your views here.
@@ -489,3 +489,80 @@ class LoginView(View):
             response = {"message": str(error)}
             status = 400
         return JsonResponse(response, status=status)
+
+
+class SupportView(View):
+    @method_decorator(csrf_exempt)
+    def dispatch(self, request, *args: any, **kwargs: any):
+        return super().dispatch(request, *args, **kwargs)
+
+    def post(self, request, param):
+        try:
+            body = json.loads(request.body)
+            if param == "medication":
+                name = body.get("name")
+                price = body.get("price")
+                dosage = body.get("dosage")
+                InformationSupport.registerDrugInventory(name, price, dosage)
+                message = "Medicamento creado satisfactoriamente"
+                status = 200
+            elif param == "procedure":
+                name = body.get("name")
+                description = body.get("description")
+                InformationSupport.registerProcedures(name, description)
+                message = "Procedimiento creado satisfactoriamente"
+                status = 200
+            else:
+                message = "Parametro no valido"
+                status = 400
+        except Exception as error:
+            message = str(error)
+            status = 400
+        return JsonResponse({"message": message}, status=status, safe=False)
+
+    def put(self, request, param):
+        try:
+            body = json.loads(request.body)
+            if param == "medication":
+                id = body.get("id")
+                name = body.get("name")
+                price = body.get("price")
+                dosage = body.get("dosage")
+                InformationSupport.updateDrugInventory(id, name, price, dosage)
+                message = "Medicamento actualizado satisfactoriamente"
+                status = 200
+            elif param == "procedure":
+                id = body.get("id")
+                name = body.get("name")
+                description = body.get("description")
+                InformationSupport.updateProcedures(id, name, description)
+                message = "Procedimiento actualizado satisfactoriamente"
+                status = 200
+            else:
+                message = "Parametro no valido"
+                status = 400
+        except Exception as error:
+            message = str(error)
+            status = 400
+        return JsonResponse({"message": message}, status=status, safe=False)
+
+    def delete(self, request, param):
+        try:
+            body = json.loads(request.body)
+            if param == "medication":
+                id = body.get("id")
+                InformationSupport.deleteDrug(id)
+                message = "Medicamento eliminado satisfactoriamente"
+                status = 200
+            elif param == "procedure":
+                id = body.get("id")
+                InformationSupport.deleteProcedure(id)
+                message = "Procedimiento eliminado satisfactoriamente"
+                status = 200
+            else:
+                message = "Parametro no valido"
+                status = 400
+        except Exception as error:
+            message = str(error)
+            status = 400
+        return JsonResponse({"message": message}, status=status, safe=False)
