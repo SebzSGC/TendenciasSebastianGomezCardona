@@ -32,11 +32,11 @@ import { AiOutlineSetting } from 'react-icons/ai'
 import { BiCalendar, BiUserPlus } from 'react-icons/bi'
 
 export const MenuDatas = [
-  {
-    title: 'Dashboard',
-    path: '/',
-    icon: HiOutlineHome,
-  },
+  // {
+  //   title: 'Dashboard',
+  //   path: '/',
+  //   icon: HiOutlineHome,
+  // },
   {
     title: 'Pacientes',
     path: '/patients',

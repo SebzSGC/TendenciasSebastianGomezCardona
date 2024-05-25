@@ -40,14 +40,14 @@ export function MedicalInsurance({ nextStep, backStep, button = true }) {
               contact,
               medicalInsurance
             )
-            console.log(response)
             resolve(response)
 
             sessionStorage.removeItem('patient')
             sessionStorage.removeItem('contact')
-            sessionStorage.removeItem('medicalInsurance')
             nextStep()
           } else {
+            sessionStorage.removeItem('patient')
+            sessionStorage.removeItem('contact')
             reject('Error al guardar el paciente en la base de datos')
           }
         } catch (error) {
@@ -81,7 +81,7 @@ export function MedicalInsurance({ nextStep, backStep, button = true }) {
             <Input
               label="Numero de poliza"
               color={true}
-              type="text"
+              type="number"
               register={register('policyNumber')}
               error={errors.policyNumber}
             />

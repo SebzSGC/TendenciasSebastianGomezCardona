@@ -1,4 +1,4 @@
-import Layout from '../Layout';
+import Layout from '../Layout'
 import {
   BsArrowDownLeft,
   BsArrowDownRight,
@@ -6,30 +6,30 @@ import {
   BsCheckCircleFill,
   BsClockFill,
   BsXCircleFill,
-} from 'react-icons/bs';
-import { DashboardBigChart, DashboardSmallChart } from '../components/Charts';
+} from 'react-icons/bs'
+import { DashboardBigChart, DashboardSmallChart } from '../components/Charts'
 import {
   appointmentsData,
   dashboardCards,
   memberData,
   reviewData,
   transactionData,
-} from '../components/Datas';
-import { Transactiontable } from '../components/Tables';
-import { Link } from 'react-router-dom';
-import { FaStar } from 'react-icons/fa';
+} from '../components/Datas'
+import { Transactiontable } from '../components/Tables'
+import { Link } from 'react-router-dom'
+import { FaStar } from 'react-icons/fa'
 
 function Dashboard() {
   return (
     <Layout>
       {/* boxes */}
-      <div className="w-full grid xl:grid-cols-4 gap-6 lg:grid-cols-3 sm:grid-cols-2 grid-cols-1">
+      <div className="grid w-full grid-cols-1 gap-6 xl:grid-cols-4 lg:grid-cols-3 sm:grid-cols-2">
         {dashboardCards.map((card, index) => (
           <div
             key={card.id}
             className=" bg-white rounded-xl border-[1px] border-border p-5"
           >
-            <div className="flex gap-4 items-center">
+            <div className="flex items-center gap-4">
               <div
                 className={`w-10 h-10 flex-colo bg-opacity-10 rounded-md ${card.color[1]} ${card.color[0]}`}
               >
@@ -37,13 +37,13 @@ function Dashboard() {
               </div>
               <h2 className="text-sm font-medium">{card.title}</h2>
             </div>
-            <div className="grid grid-cols-8 gap-4 mt-4 bg-dry py-5 px-8 items-center rounded-xl">
+            <div className="grid items-center grid-cols-8 gap-4 px-8 py-5 mt-4 bg-dry rounded-xl">
               <div className="col-span-5">
                 {/* statistc */}
                 <DashboardSmallChart data={card.datas} colors={card.color[2]} />
               </div>
-              <div className="flex flex-col gap-4 col-span-3">
-                <h4 className="text-md font-medium">
+              <div className="flex flex-col col-span-3 gap-4">
+                <h4 className="font-medium text-md">
                   {card.value}
                   {
                     // if the id === 4 then add the $ sign
@@ -63,38 +63,38 @@ function Dashboard() {
           </div>
         ))}
       </div>
-      <div className="w-full my-6 grid xl:grid-cols-8 grid-cols-1 gap-6">
-        <div className="xl:col-span-6  w-full">
+      <div className="grid w-full grid-cols-1 gap-6 my-6 xl:grid-cols-8">
+        <div className="w-full xl:col-span-6">
           {/* eye banner */}
           <div className=" bg-white rounded-xl border-[1px] border-border relative">
             <img
               src="/images/banner.avif"
-              className="w-full h-72 object-cover rounded"
+              className="object-cover w-full rounded h-72"
               alt="banner"
             />
-            <div className="space-y-4 py-5 md:px-12 px-6 absolute top-0 bottom-0 left-0 right-0 bg-subMain bg-opacity-10 flex flex-col justify-center">
-              <h1 className="text-xl text-subMain capitalize font-semibold">
+            <div className="absolute top-0 bottom-0 left-0 right-0 flex flex-col justify-center px-6 py-5 space-y-4 md:px-12 bg-subMain bg-opacity-10">
+              <h1 className="text-xl font-semibold capitalize text-subMain">
                 The future of eye care is here
               </h1>
-              <p className="text-xs text-textGray max-w-96 leading-6">
+              <p className="text-xs leading-6 text-textGray max-w-96">
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                 eiusmod tempor asin cididunt ut labore et dolore magna ali qua.
                 Lorem ipsum dolor sit amet.
               </p>
               <div>
                 {' '}
-                <button className="py-3 px-6 rounded bg-subMain text-white flex-colo transitions text-xs">
+                <button className="px-6 py-3 text-xs text-white rounded bg-subMain flex-colo transitions">
                   Read More
                 </button>
               </div>
             </div>
           </div>
           <div className="mt-6 bg-white rounded-xl border-[1px] border-border p-5">
-            <div className="flex-btn gap-2">
+            <div className="gap-2 flex-btn">
               <h2 className="text-sm font-medium">Earning Reports</h2>
-              <p className="flex gap-4 text-sm items-center">
+              <p className="flex items-center gap-4 text-sm">
                 5.44%{' '}
-                <span className="py-1 px-2 bg-subMain text-white text-xs rounded-xl">
+                <span className="px-2 py-1 text-xs text-white bg-subMain rounded-xl">
                   +2.4%
                 </span>
               </p>
@@ -106,11 +106,11 @@ function Dashboard() {
           </div>
           {/* transaction */}
           <div className="mt-6 bg-white rounded-xl border-[1px] border-border p-5">
-            <div className="flex-btn gap-2">
+            <div className="gap-2 flex-btn">
               <h2 className="text-sm font-medium">Recent Transaction</h2>
-              <p className="flex gap-4 text-sm items-center">
+              <p className="flex items-center gap-4 text-sm">
                 Today{' '}
-                <span className="py-1 px-2 bg-subMain text-white text-xs rounded-xl">
+                <span className="px-2 py-1 text-xs text-white bg-subMain rounded-xl">
                   27000$
                 </span>
               </p>
@@ -130,7 +130,7 @@ function Dashboard() {
           data-aos-duration="1000"
           data-aos-delay="10"
           data-aos-offset="200"
-          className="xl:col-span-2 xl:block grid sm:grid-cols-2 gap-6"
+          className="grid gap-6 xl:col-span-2 xl:block sm:grid-cols-2"
         >
           {/* review */}
           <div className="bg-white rounded-xl border-[1px] border-border p-5">
@@ -138,24 +138,24 @@ function Dashboard() {
             {reviewData.slice(1, 3).map((rev, index) => (
               <div
                 key={index}
-                className="flex-btn gap-4 mt-6 border-b pb-4 border-border"
+                className="gap-4 pb-4 mt-6 border-b flex-btn border-border"
               >
-                <div className="flex gap-4 items-center">
+                <div className="flex items-center gap-4">
                   <img
                     src={rev?.user?.image}
                     alt={rev?.user?.title}
-                    className="w-10 h-10 rounded-md object-cover"
+                    className="object-cover w-10 h-10 rounded-md"
                   />
                   <div className="flex flex-col gap-1">
                     <h3 className="text-xs font-medium">{rev?.user?.title}</h3>
-                    <p className="text-xs text-gray-400 text-wrap leading-5 max-w-44 truncate">
+                    <p className="text-xs leading-5 text-gray-400 truncate text-wrap max-w-44">
                       {rev?.comment.slice(0, 45)}...
                     </p>
                   </div>
                 </div>
-                <div className="flex-rows gap-1">
+                <div className="gap-1 flex-rows">
                   <p className="text-xs text-textGray">{rev?.star}</p>
-                  <p className="text-orange-500 text-xs">
+                  <p className="text-xs text-orange-500">
                     <FaStar />
                   </p>
                 </div>
@@ -169,13 +169,13 @@ function Dashboard() {
               <Link
                 to={`/patients/preview/${member.id}`}
                 key={index}
-                className="flex-btn gap-4 mt-6 border-b pb-4 border-border"
+                className="gap-4 pb-4 mt-6 border-b flex-btn border-border"
               >
-                <div className="flex gap-4 items-center">
+                <div className="flex items-center gap-4">
                   <img
                     src={member.image}
                     alt="member"
-                    className="w-10 h-10 rounded-md object-cover"
+                    className="object-cover w-10 h-10 rounded-md"
                   />
                   <div className="flex flex-col gap-1">
                     <h3 className="text-xs font-medium">{member.title}</h3>
@@ -188,16 +188,16 @@ function Dashboard() {
           </div>
           {/* today apointments */}
           <div className="bg-white rounded-xl border-[1px] border-border p-5 xl:mt-6">
-            <h2 className="text-sm mb-4 font-medium">Today Appointments</h2>
+            <h2 className="mb-4 text-sm font-medium">Today Appointments</h2>
             {appointmentsData.map((appointment, index) => (
               <div
                 key={appointment.id}
-                className="grid grid-cols-12 gap-2 items-center"
+                className="grid items-center grid-cols-12 gap-2"
               >
                 <p className="text-textGray text-[12px] col-span-3 font-light">
                   {appointment.time}
                 </p>
-                <div className="flex-colo relative col-span-2">
+                <div className="relative col-span-2 flex-colo">
                   <hr className="w-[2px] h-20 bg-border" />
                   <div
                     className={`w-7 h-7 flex-colo text-sm bg-opacity-10
@@ -221,7 +221,7 @@ function Dashboard() {
                 </div>
                 <Link
                   to="/appointments"
-                  className="flex flex-col gap-1 col-span-6"
+                  className="flex flex-col col-span-6 gap-1"
                 >
                   <h2 className="text-xs font-medium">
                     {appointment.user?.title}
@@ -236,7 +236,7 @@ function Dashboard() {
         </div>
       </div>
     </Layout>
-  );
+  )
 }
 
-export default Dashboard;
+export default Dashboard
