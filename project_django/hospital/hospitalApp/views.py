@@ -37,6 +37,7 @@ class PatientView(View):
             message = str(error)
             status = 400
         response = {"message": message}
+        print(response)
         return JsonResponse(response, status=status)
 
     def get(self, request, idDocument=None):

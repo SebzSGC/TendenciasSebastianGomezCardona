@@ -40,5 +40,5 @@ export const MedicalValidation = yup.object().shape({
       /^[a-zA-Z\s]+$/,
       'Nombre del seguro medico debe contener solo letras'
     ),
-  policyNumber: yup.string().required('La poliza es obligatoria'),
+  policyNumber: yup.number().required('La poliza es obligatoria'),
 })
